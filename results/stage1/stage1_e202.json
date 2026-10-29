@@ -1,0 +1,94 @@
+{
+ "turn": 202,
+ "head": "7fa0305a4752ed4a16023e73969fb2c684c5f88797aa9257c18dc8f0f98a03b8",
+ "candidate": "41a1afd0b9ad7bbc22f1b8b08c236073c218bbb90daa303d543139b6389221b9",
+ "grad": {
+  "objective": 0.00029795977752655745,
+  "objective_published": 0.00029795977752655745,
+  "preclip": 0.5080041885375977,
+  "preclip_published": 0.5062966346740723,
+  "plan_ok": true,
+  "rollouts": 72,
+  "active": 72,
+  "rollout_loss_max_abs_diff": 0.0,
+  "support_outside_tokens": 0,
+  "loss_tokens": 158382
+ },
+ "scales": {
+  "raw_update_norm": 0.022434129456058875,
+  "raw_update_norm_published": 0.022434127616895564,
+  "tensors_rel_capped": 242,
+  "tensors_rel_capped_published": 242
+ },
+ "numel": 8953803264,
+ "intended_norm": 0.022434129421615892,
+ "candidate_mismatched_elements": 463963,
+ "rtn_changed_small_weights": 41485461,
+ "changed_elements_published": 41486529,
+ "fp32": {
+  "changed": 8953796989,
+  "changed_frac": 0.9999992991804918,
+  "norm": 0.022434129421615892,
+  "norm_ratio": 1.0,
+  "cos_intended": 1.0,
+  "first_order_loss_change": -0.004452184858513745
+ },
+ "rtn": {
+  "changed": 41486264,
+  "changed_frac": 0.004633367830048404,
+  "norm": 0.002240862999726836,
+  "norm_ratio": 0.0998863364658895,
+  "cos_intended": 0.07555771803472242,
+  "first_order_loss_change": -3.7556402763892995e-05
+ },
+ "sr": {
+  "changed": 143248617,
+  "changed_frac": 0.015998633516547185,
+  "norm": 0.3329838055903429,
+  "norm_ratio": 14.842733557091098,
+  "cos_intended": 0.06733982557507082,
+  "first_order_loss_change": -0.004448545697152307
+ },
+ "probe_head": {
+  "ll_correct": -0.09264695644378662,
+  "ll_wrong": -0.11486558616161346,
+  "ll_capped": -1.0415818691253662,
+  "logPS": -0.03506064414978027,
+  "logPS_capped": -0.09496030956506729,
+  "eos_think": 2.81388179246278e-06
+ },
+ "probe_linear_delta": {
+  "fp32": {
+   "ll_correct": -0.028506658697310144,
+   "ll_wrong": -0.018962329712552843,
+   "ll_capped": -0.07441457762025384,
+   "logPS": -0.03970398865209949,
+   "logPS_capped": -0.07220007343668311,
+   "eos_think": 4.235072340963327e-06
+  },
+  "rtn": {
+   "ll_correct": -0.0002196545199334157,
+   "ll_wrong": -0.00014782741347797105,
+   "ll_capped": -0.0005874566901102212,
+   "logPS": -0.0003106807348513582,
+   "logPS_capped": -0.000570463145929241,
+   "eos_think": 3.325479631178899e-08
+  },
+  "sr": {
+   "ll_correct": -0.028499564740175197,
+   "ll_wrong": -0.018924224177169557,
+   "ll_capped": -0.07430554680601419,
+   "logPS": -0.039668478729088484,
+   "logPS_capped": -0.07209282623336641,
+   "eos_think": 4.221081743967328e-06
+  }
+ },
+ "probe_direct_delta_rtn": {
+  "ll_correct": -0.00037100911140441895,
+  "ll_wrong": -0.00042839348316192627,
+  "ll_capped": -0.0010561943054199219,
+  "logPS": -0.0003564506769180298,
+  "logPS_capped": -0.0007706806063652039,
+  "eos_think": -5.725519258703571e-08
+ }
+}
