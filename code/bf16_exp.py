@@ -38,6 +38,7 @@ SLICES = {P + 'layers.31.mlp.down_proj.weight': None, P + 'layers.31.self_attn.o
           'lm_head.weight[248000:248077]': ('lm_head.weight', 248000, 248077),
           'lm_head.weight[100000:101024]': ('lm_head.weight', 100000, 101024)}
 FNAMES = ('ll_correct', 'll_wrong', 'll_capped', 'logPS', 'logPS_capped', 'eos_think')
+ROWWISE = ('model.language_model.embed_tokens.weight', 'lm_head.weight')
 CH = 1 << 25            # flat chunk size for the per-tensor step math (bounded temporaries on the 1e9-element embeddings)
 PROBE_BUDGET = 16384    # packed tokens per probe bin
 bf16_w32 = lambda n, p, sl: p.detach().view(-1)[sl].float()
@@ -46,6 +47,16 @@ bf16_w32 = lambda n, p, sl: p.detach().view(-1)[sl].float()
 def load_mod(name, path):
     spec = importlib.util.spec_from_file_location(name, path); m = importlib.util.module_from_spec(spec)
     sys.modules[name] = m; spec.loader.exec_module(m); return m
+
+
+def parse_turns(spec):
+    """'197-213' | '210-197' (reversed) | '202,212,215' | '226-228,232-235' -> list of epochs in order."""
+    out = []
+    for part in spec.split(','):
+        lo, _, hi = part.partition('-')
+        lo, hi = int(lo), int(hi or lo)
+        out += list(range(lo, hi + 1) if lo <= hi else range(lo, hi - 1, -1))
+    return out
 
 
 def say(log, *a):
@@ -75,6 +86,11 @@ class Env:
         self.adv_pos = False        # ablation: keep only positive advantages
         self.no_overlong = False    # ablation: overlong_penalty = 0 (capped rollouts score 0 like wrong ones)
         self.opt = 'sign'           # 'sign' (official fresh-AdamW step) | 'normgrad' (gradient direction, same per-tensor step norm)
+                                    # | 'normgrad_row' (normgrad, but embed_tokens / lm_head normalized and rel-capped per row)
+                                    # | 'normgrad_clip' (normgrad, each element clipped to clip_k x the per-element sign step)
+        self.clip_k = 4.0
+        self.step_mult = 1.0        # normgrad family: multiply each tensor's step (Arbos's 0.5x / 0.25x arms)
+        self.rowscale, self.cols = {}, {}
         FK, LC = self.FK, self.R.LOGIT_CHUNK
 
         def blp(runtime, items, *, gradients, engine, logit_chunk=2048, support=None):
@@ -218,7 +234,28 @@ class Env:
                 rr[name] = rt; dn2.append(q * rt * rt)
         raw = math.sqrt(math.fsum(dn2)); cscale = min(1.0, cap / raw) if raw > 0 else 1.0
         # normgrad: d_t = |d_sign,t| * g_t / |g_t|  (stored as the multiplier on g)
-        self.gscale = {n: (cscale * rr[n] * math.sqrt(qq[n]) / math.sqrt(gn2[n])) if gn2[n] > 0 else 0.0 for n in rr}
+        self.gscale = {n: (self.step_mult * cscale * rr[n] * math.sqrt(qq[n]) / math.sqrt(gn2[n])) if gn2[n] > 0 else 0.0 for n in rr}
+        self.rowscale = {}
+        if self.opt == 'normgrad_row':
+            # each row of embed_tokens / lm_head is its own tensor: d_r = min(|d_sign,r|, trc |W_r|) * g_r / |g_r|
+            with self.torch.no_grad():
+                for name, p in params:
+                    if name not in ROWWISE:
+                        continue
+                    rows, cols = p.shape; self.cols[name] = cols
+                    q_r = self.torch.zeros(rows, dtype=self.torch.float64, device=p.device)
+                    w_r, g_r = self.torch.zeros_like(q_r), self.torch.zeros_like(q_r)
+                    R = max(1, CH // cols); G = total[name]; dec = self.decay(name, p)
+                    for r0 in range(0, rows, R):
+                        sl = slice(r0, min(r0 + R, rows))
+                        w32 = w32_of(name, p, slice(sl.start * cols, sl.stop * cols)).view(-1, cols); g = G[sl]
+                        q_r[sl] = self.delta(dec, w32, g, lr).double().pow(2).sum(1)
+                        w_r[sl] = w32.double().pow(2).sum(1); g_r[sl] = g.double().pow(2).sum(1)
+                    budget = q_r.sqrt()
+                    if trc is not None:
+                        budget = self.torch.minimum(budget, trc * (1 - 1e-6) * w_r.sqrt())
+                    self.rowscale[name] = self.torch.where(g_r > 0, self.step_mult * cscale * budget / g_r.sqrt().clamp_min(1e-30),
+                                                           self.torch.zeros_like(budget)).float()
         return {n: cscale * v for n, v in rr.items()}, dict(raw_update_norm=raw, raw_update_norm_published=sgd.get('raw_update_norm'),
                                                             tensors_rel_capped=sum(v < 1.0 for v in rr.values()),
                                                             tensors_rel_capped_published=sgd.get('tensors_rel_capped'))
@@ -233,8 +270,17 @@ class Env:
         out = torch.where(torch.isfinite(x), out, x)
         return out.to(torch.bfloat16)                                # exact: low 16 bits are zero
 
-    def new_weights(self, decay, w32, g, scale, lr, mode, seed, name=None):
-        d = self.gscale[name] * g if (self.opt == 'normgrad' and name is not None) else scale * self.delta(decay, w32, g, lr)
+    def new_weights(self, decay, w32, g, scale, lr, mode, seed, name=None, sl=None):
+        if name is not None and self.opt == 'normgrad_row' and name in self.rowscale:
+            rows = self.torch.arange(sl.start, sl.stop, device=g.device) // self.cols[name]
+            d = self.rowscale[name][rows] * g
+        elif name is not None and self.opt in ('normgrad', 'normgrad_row', 'normgrad_clip'):
+            d = self.gscale[name] * g
+            if self.opt == 'normgrad_clip':
+                b = self.clip_k * scale * lr
+                d = d.clamp(-b, b)
+        else:
+            d = scale * self.delta(decay, w32, g, lr)
         new32 = w32 - d
         newbf = self.sr_round(new32, seed) if mode == 'sr' else new32.to(self.torch.bfloat16)
         return d, new32, newbf
@@ -525,10 +571,9 @@ def cmd_stream(a):
     env = Env(a.source, a.host); torch = env.torch
     think_end = model_cfg(env, a.start)
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True); log = out / 'log.txt'
-    env.adv_pos, env.no_overlong, env.opt = a.adv_pos, a.no_overlong, a.opt
-    say(log, 'ARM', a.arm, 'opt', a.opt, 'adv_pos', a.adv_pos, 'no_overlong', a.no_overlong)
-    lo, hi = map(int, a.turns.split('-'))
-    Ts = [env.load_turn(a.data, e) for e in range(lo, hi + 1)]
+    env.adv_pos, env.no_overlong, env.opt, env.clip_k, env.step_mult = a.adv_pos, a.no_overlong, a.opt, a.clip_k, a.step_mult
+    say(log, 'ARM', a.arm, 'opt', a.opt, 'step_mult', a.step_mult, 'adv_pos', a.adv_pos, 'no_overlong', a.no_overlong, 'turns', a.turns)
+    Ts = [env.load_turn(a.data, e) for e in parse_turns(a.turns)]
     env.ensure_refs(Ts, a.refdir, a.ref, log)
     if a.arm == 'fp32_renorm':
         assert hasattr(env.B, 'SUPPORT_RENORM'), 'fp32_renorm needs the patched host'
@@ -542,13 +587,13 @@ def cmd_stream(a):
     sd_get = lambda n: pd[n].detach()
     start_slices = {k: slice_of(k, sd_get).float().cpu().clone() for k in SLICES}
     import numpy as np
-    dirs = dict(np.load(a.dirs))
+    dirs = dict(np.load(a.dirs)) if Path(a.dirs).exists() else {}     # collapse directions (EXP-022), optional: alignment skipped without them
     items, cats = build_probe_items(env, a.data, a.probe_turn)
 
     def snapshot(step):
         vals = probe_values(env, actor, items, cats, think_end)
         al = {}
-        for dn in ('collapse_b1', 'collapse_orig'):
+        for dn in ('collapse_b1', 'collapse_orig') if dirs else ():
             agree = n = 0
             agree_m = n_m = 0
             for k in SLICES:
@@ -570,7 +615,12 @@ def cmd_stream(a):
 
     snapshot(0)
     cum_pub2 = 0.0
-    gated = bool(a.gate_tasks)
+    observe = {int(x) for x in a.observe_steps.split(',')} if a.observe_steps else set()
+    gated = bool(a.gate_tasks) and not observe
+    if observe:
+        h0 = out / 'gate_s00.jsonl'
+        head0 = ([json.loads(x) for x in h0.read_text().splitlines() if x.strip()]
+                 if Path(str(h0) + '.summary.json').exists() else gate_run(a, a.start, h0, log))
     if gated:
         h0 = out / 'gate_s00.jsonl'
         head_rows = ([json.loads(x) for x in h0.read_text().splitlines() if x.strip()]
@@ -603,7 +653,7 @@ def cmd_stream(a):
             for i, (name, p) in enumerate(params):
                 dec = env.decay(name, p); flat = p.data.view(-1)
                 for c, sl, w, w32, g in env.chunks(name, p, total, w32_of):
-                    d, new32, newbf = env.new_weights(dec, w32, g, sc[name], lr, mode, 1000003 * s + 4096 * i + c, name=name)
+                    d, new32, newbf = env.new_weights(dec, w32, g, sc[name], lr, mode, 1000003 * s + 4096 * i + c, name=name, sl=sl)
                     real = newbf.float() - w.float()
                     int2 += float(d.double().pow(2).sum()); real2 += float(real.double().pow(2).sum())
                     dot += float((real.double() * (-d).double()).sum())
@@ -618,6 +668,12 @@ def cmd_stream(a):
                    realized_over_intended=math.sqrt(real2 / int2) if int2 else None,
                    cos=dot / math.sqrt(int2 * real2) if int2 and real2 else None, changed=changed,
                    first_order_loss_change_intended=g_int, first_order_loss_change_realized=g_real, seconds=time.time() - t0)
+        if s in observe:
+            # ungated trajectory, evaluated on the gate set against the start (no accept / reject)
+            save_like(a.start, a.cand_dir, actor.model, log)
+            g = gate_compare(head0, gate_run(a, a.cand_dir, out / f'gate_s{s:02d}.jsonl', log))
+            rec.update(observe=g, seconds=time.time() - t0)
+            say(log, 'OBSERVE', s, T.e, f"vs start: z {g['z']:+.2f} diff {g['diff']:+.4f} pass {g['cand_pass']:.4f} capped {g['cand_capped']:.3f}")
         if gated:
             save_like(a.start, a.cand_dir, actor.model, log)
             cand_rows = gate_run(a, a.cand_dir, out / f'gate_s{s:02d}.jsonl', log)
@@ -644,21 +700,71 @@ def cmd_stream(a):
     say(log, 'STREAM_DONE', a.arm)
 
 
+def cmd_pooled(a):
+    """One miner's big batch as ONE step: average the (clipped) gradients of several turns at the start weights, take a single
+    fp32 + renorm + normgrad step at several step multipliers, score each candidate on the gate set against the start."""
+    env = Env(a.source, a.host); torch = env.torch
+    think_end = model_cfg(env, a.start)
+    out = Path(a.out); out.mkdir(parents=True, exist_ok=True); log = out / 'log.txt'
+    env.opt = 'normgrad'
+    lo, hi = map(int, a.turns.split('-'))
+    Ts = [env.load_turn(a.data, e) for e in range(lo, hi + 1)]
+    env.ensure_refs(Ts, a.refdir, a.ref, log)
+    env.B.SUPPORT_RENORM = dict(SUPPORT)
+    actor = env.R.Runtime(a.start, True, Ts[0].head); env.FK.install(actor.model)
+    params = [(n, p) for n, p in actor.model.named_parameters() if p.requires_grad]
+    start_b = {n: p.detach().cpu().clone() for n, p in params}
+    acc = None
+    for T in Ts:
+        total, info = env.gradient(actor, params, T, a.refdir)
+        if acc is None:
+            acc = {n: g.cpu() for n, g in total.items()}
+        else:
+            for n, g in total.items():
+                acc[n].add_(g.cpu())
+        del total; gc.collect(); torch.cuda.empty_cache()
+        say(log, 'GRAD', T.e, f"preclip {info['preclip']:.4f} outside {info['support_outside_tokens']}")
+    total = {n: (g / len(Ts)).to('cuda') for n, g in acc.items()}; del acc
+    sc, sinfo = env.scales(params, total, Ts[0].sgd, bf16_w32)
+    base_gscale = dict(env.gscale)
+    total = {n: g.cpu() for n, g in total.items()}; gc.collect(); torch.cuda.empty_cache()   # free the GPU for vLLM
+    h0 = out / 'gate_s00.jsonl'
+    head0 = [json.loads(x) for x in h0.read_text().splitlines() if x.strip()]
+    lr = Ts[0].sgd['sgd_lr']
+    for mult in [float(x) for x in a.mults.split(',')]:
+        env.gscale = {n: v * mult for n, v in base_gscale.items()}
+        tg = {n: g.to('cuda') for n, g in total.items()}
+        with torch.no_grad():
+            for i, (name, p) in enumerate(params):
+                dec = env.decay(name, p); flat = p.data.view(-1)
+                for c, sl, w, w32, g in env.chunks(name, p, tg, bf16_w32):
+                    _, _, newbf = env.new_weights(dec, w32, g, sc[name], lr, 'rtn', 0, name=name)
+                    flat[sl].copy_(newbf)
+        del tg; gc.collect(); torch.cuda.empty_cache()
+        save_like(a.start, a.cand_dir, actor.model, log)
+        g = gate_compare(head0, gate_run(a, a.cand_dir, out / f'gate_pool_x{mult:g}.jsonl', log))
+        say(log, 'POOLED', f'{len(Ts)} turns {lo}-{hi}', f'x{mult:g}', f"vs start: z {g['z']:+.2f} diff {g['diff']:+.4f} pass {g['cand_pass']:.4f} capped {g['cand_capped']:.3f}")
+        with open(out / 'pooled.jsonl', 'a') as f:
+            f.write(json.dumps(dict(turns=[T.e for T in Ts], mult=mult, **g)) + '\n')
+        with torch.no_grad():
+            for n, p in params:
+                p.data.copy_(start_b[n].to(p.device))
+    say(log, 'POOLED_DONE')
+
+
 def cmd_refs(a):
     env = Env(a.source, a.host); model_cfg(env, a.ref)
-    lo, hi = map(int, a.turns.split('-'))
-    env.ensure_refs([env.load_turn(a.data, e) for e in range(lo, hi + 1)], a.refdir, a.ref, Path(a.refdir) / 'log.txt')
+    env.ensure_refs([env.load_turn(a.data, e) for e in parse_turns(a.turns)], a.refdir, a.ref, Path(a.refdir) / 'log.txt')
 
 
 def cmd_dry(a):
     """CPU check of the batch path: rebuild each turn, compare the planned rank tokens with the published plan."""
     env = Env(a.source, a.host); think_end = model_cfg(env, a.cfgdir)
-    lo, hi = map(int, a.turns.split('-'))
     items, cats = build_probe_items(env, a.data, a.probe_turn)
     c = probe_counts(items, cats, think_end)
     print('PROBE', a.probe_turn, len(items), 'cats', c['cat'], 'tokens', sum(len(o) for _, o in items), 'bins', len(probe_bins(items)),
           'with </think>', sum(think_end in o for _, o in items), flush=True)
-    for e in range(lo, hi + 1):
+    for e in parse_turns(a.turns):
         T = env.load_turn(a.data, e); L = env.layout(T)
         cats = [2 if r['rollout'].stop == 'max_tokens' else (0 if r['reward'] >= 0.5 else 1) for r in L.rows]
         print('DRY', e, 'groups', len(T.groups), 'rows', len(L.rows), 'active', len(L.active), 'plan_ok', L.plan_ok,
@@ -668,7 +774,7 @@ def cmd_dry(a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('cmd', choices=['refs', 'stage1', 'stream', 'dry'])
+    ap.add_argument('cmd', choices=['refs', 'stage1', 'stream', 'dry', 'pooled'])
     ap.add_argument('--source', required=True); ap.add_argument('--host', default=str(HERE / 'replay' / 'host'))
     ap.add_argument('--data', required=True); ap.add_argument('--refdir', default='/data/refcache')
     ap.add_argument('--ref'); ap.add_argument('--out')
@@ -677,12 +783,14 @@ def main():
     ap.add_argument('--turns'); ap.add_argument('--arm', choices=['rtn', 'fp32', 'fp32_renorm', 'sr', 'randsign'])
     ap.add_argument('--start'); ap.add_argument('--passes', type=int, default=1); ap.add_argument('--probe-every', type=int, default=6)
     ap.add_argument('--save'); ap.add_argument('--dirs', default=str(HERE / 'dirs.npz')); ap.add_argument('--cfgdir')
-    ap.add_argument('--opt', choices=['sign', 'normgrad'], default='sign'); ap.add_argument('--adv-pos', action='store_true')
+    ap.add_argument('--opt', choices=['sign', 'normgrad', 'normgrad_row', 'normgrad_clip'], default='sign')
+    ap.add_argument('--clip-k', type=float, default=4.0); ap.add_argument('--step-mult', type=float, default=1.0)
+    ap.add_argument('--adv-pos', action='store_true')
     ap.add_argument('--no-overlong', action='store_true')
     ap.add_argument('--gate-tasks'); ap.add_argument('--gate-py', default='/data/venvB/bin/python'); ap.add_argument('--gate-k', type=int, default=4)
-    ap.add_argument('--cand-dir')
+    ap.add_argument('--cand-dir'); ap.add_argument('--observe-steps'); ap.add_argument('--mults', default='1,4')
     a = ap.parse_args()
-    dict(refs=cmd_refs, stage1=cmd_stage1, stream=cmd_stream, dry=cmd_dry)[a.cmd](a)
+    dict(refs=cmd_refs, stage1=cmd_stage1, stream=cmd_stream, dry=cmd_dry, pooled=cmd_pooled)[a.cmd](a)
 
 
 if __name__ == '__main__':

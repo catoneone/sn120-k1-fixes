@@ -11,8 +11,10 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | `code/gate_eval.py` | Official-style gate eval used in the gated runs (1,000 tasks × 4) |
 | `code/fetch_k1.py` | Downloads `/k1/turns/<e>/turn.json` and the batch documents (by sha256) |
 | `code/gated.sh`, `code/summarize.py` | Gated-run driver; results summary |
+| `EXPERIMENT-2x2.md`, `code/run_2x2.sh` | Head × batch 2×2 on 7fa0305a / 6b16e298, plus the extra 6b16e298 arms: one command, pre-registered decision rules |
 | `data/heldout.json` | The 750 held-out tasks: `index`, `prompt_ids`, `answer`, `level`, `subject` |
 | `data/gate.json` | The 1,000-task gate set used in the gated runs (same format) |
+| `data/gate_B.json` | The 977 tasks of `gate.json` not used in any batch e196–e245 (live-head runs and the 2×2) |
 | `results/` | Per-arm step logs (`steps.jsonl`), fixed-text probes (`snapshots.jsonl`), single-step results (`stage1/`), and per-sample generation results (`gen_*/trunc.jsonl`, `full.jsonl`, `summary.json`) |
 
 ## Held-out set
@@ -41,6 +43,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 ## Training arms (`bf16_exp.py stream`)
 
 - **Common setup:** start checkpoint 7fa0305a; K=1 batches e197–e213 applied in order, every step accepted (the gated runs are the exception). The probe text is the e196 batch, which is not used for training.
+- **`--turns`** takes a range (`197-213`), a reversed range (`210-197`) or a comma list (`226-228,232-235`).
 - **Environment:** torch 2.14 / transformers 5.14.1 / fla 0.6.0, with your signed source tree (bundle `a2a03cb3…`) and your `/k1/replay/host/` files. The `fp32_renorm` arms use the host files with `patch/support_renorm.diff` applied.
 
 | Arm | Flags |
@@ -51,6 +54,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | stochastic rounding | `--arm sr` |
 | random-sign control | `--arm randsign` |
 | fp32 + renorm + gradient-direction step | `--arm fp32_renorm --opt normgrad` |
+| same, smaller or larger step | add `--step-mult 0.5` (scales each tensor's step) |
 | fp32 + renorm, positive advantages only | `--arm fp32_renorm --adv-pos` |
 | gated | add `--gate-tasks data/gate.json --cand-dir DIR` (a rejected step rolls back the bf16 weights and the fp32 master) |
 

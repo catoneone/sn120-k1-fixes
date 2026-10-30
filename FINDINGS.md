@@ -145,8 +145,13 @@ Raw logs for these runs are in `results/round3/`.
 | 6 (e245) | **87.8% (+3.7)** | **88.1% (+4.0)** | 82.2% (−1.9) |
 
 - **The gradient-direction step does not collapse from this head.** It dips and then recovers to +4pp by step 3, as it did from 7fa0305a, so it does not reproduce the 6b16e298 / e226–e235 collapse.
-  - In the public turn files, the batches that came right after the dip in that chain (e229–e231) push toward *longer* answers. The batches after the dip in our chains push toward finishing.
-  - Stale replayed batches cannot react to the dip; on-policy batches, or a gate, would.
+  - All of e226–e236 were sampled from 6b16e298, so that chain is one head's data applied as 10 sub-steps.
+  - **Correction (10-30): the cause is still open.** We first blamed e229–e231, the only batches in that chain whose advantages favor not finishing.
+    - That fits the 0.25× chain, which falls from 61.6% to 30.0% exactly over those three batches.
+    - It does not fit the 0.5× chain, which is already at 33% after e226–e228.
+    - It also doesn't explain why the strongly finish-favoring e232–e234 don't bring either chain back.
+    - An alternative: once most rollouts are capped, stale batches sampled from a head that rarely caps can't pull the model back.
+    - `EXPERIMENT-2x2.md` tests both readings, plus head vs. data.
 - **Per-row capping changes nothing.** The dip does not come from the high-frequency formatting rows of embed or lm_head, so my earlier guess was wrong.
 - **Per-element clipping removes the dip and the gain together.** It ends slightly negative, much like a sign step: the few large-moving elements cause both the overshoot and the later improvement.
 - **We found no simple step-size fix that avoids the overshoot and still learns.** The safest options remain the gradient-direction step with a gate, or a per-miner chain of sub-steps judged at its end.
