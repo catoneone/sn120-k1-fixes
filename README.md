@@ -59,4 +59,4 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 ## Status
 
 - The ungated results are final.
-- The gated runs (1,000 × 4 official-style gate) are still running; see the Status section of `FINDINGS.md`. Their results will be added under `results/gated_*`.
+- The gated runs (round 3) and the ungated gate-set trajectory (round 4) are finished; see the Update section of `FINDINGS.md`. Their logs are in `results/round3/`.

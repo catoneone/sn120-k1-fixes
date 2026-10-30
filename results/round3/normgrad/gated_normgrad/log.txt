@@ -1,0 +1,61 @@
+14:33:21 ARM fp32_renorm opt normgrad adv_pos False no_overlong False
+14:34:04 SNAP 0 {"ll_correct": -0.09264695644378662, "ll_wrong": -0.11486558616161346, "ll_capped": -1.0415818691253662, "logPS": -0.03506064414978027, "logPS_capped": -0.09496030956506729, "eos_think": 2.81388179246278e-06} {"collapse_b1": 0.0, "collapse_orig": 0.0}
+14:35:01 SAVED /data/cand_normgrad
+14:51:55 GATE_EVAL /data/cand_normgrad 1014s {"samples": 4000, "pass_rate": 0.84625, "capped": 0.13975, "load_s": 35.704272747039795, "gen_s": 966.5906705856323}
+14:51:57 GATE 1 197 RED z -2.67 diff -0.0127 cand 0.8462 head 0.8590 capped 0.140 accepted 0/1
+14:51:57 STEP 1 197 changed 24657944 real/int 0.551 cos 0.483 preclip 0.3569 obj 0.000279 outside 8 1067s
+14:53:02 SAVED /data/cand_normgrad
+15:11:50 GATE_EVAL /data/cand_normgrad 1127s {"samples": 4000, "pass_rate": 0.80275, "capped": 0.18125, "load_s": 34.51312851905823, "gen_s": 1082.134851694107}
+15:11:51 GATE 2 198 RED z -10.62 diff -0.0563 cand 0.8027 head 0.8590 capped 0.181 accepted 0/2
+15:11:51 STEP 2 198 changed 24883025 real/int 0.536 cos 0.467 preclip 0.3649 obj 0.000272 outside 21 1194s
+15:13:10 SAVED /data/cand_normgrad
+15:32:01 GATE_EVAL /data/cand_normgrad 1131s {"samples": 4000, "pass_rate": 0.7885, "capped": 0.192, "load_s": 35.98764967918396, "gen_s": 1084.1858611106873}
+15:32:02 GATE 3 199 RED z -11.52 diff -0.0705 cand 0.7885 head 0.8590 capped 0.192 accepted 0/3
+15:32:02 STEP 3 199 changed 24595062 real/int 0.562 cos 0.493 preclip 0.3576 obj 0.000396 outside 86 1211s
+15:33:11 SAVED /data/cand_normgrad
+15:50:22 GATE_EVAL /data/cand_normgrad 1032s {"samples": 4000, "pass_rate": 0.8335, "capped": 0.154, "load_s": 35.228737115859985, "gen_s": 985.5330641269684}
+15:50:24 GATE 4 200 RED z -5.36 diff -0.0255 cand 0.8335 head 0.8590 capped 0.154 accepted 0/4
+15:50:24 STEP 4 200 changed 24764595 real/int 0.557 cos 0.488 preclip 0.3598 obj 0.000348 outside 47 1101s
+15:52:05 SAVED /data/cand_normgrad
+16:09:47 GATE_EVAL /data/cand_normgrad 1062s {"samples": 4000, "pass_rate": 0.821, "capped": 0.16375, "load_s": 34.989325523376465, "gen_s": 1016.0391759872437}
+16:09:49 GATE 5 201 RED z -7.32 diff -0.0380 cand 0.8210 head 0.8590 capped 0.164 accepted 0/5
+16:09:49 STEP 5 201 changed 24427232 real/int 0.568 cos 0.499 preclip 0.2629 obj 0.000270 outside 106 1165s
+16:10:47 SAVED /data/cand_normgrad
+16:31:07 GATE_EVAL /data/cand_normgrad 1220s {"samples": 4000, "pass_rate": 0.779, "capped": 0.205, "load_s": 34.83878779411316, "gen_s": 1174.436040878296}
+16:31:08 GATE 6 202 RED z -12.61 diff -0.0800 cand 0.7790 head 0.8590 capped 0.205 accepted 0/6
+16:31:08 STEP 6 202 changed 25021868 real/int 0.551 cos 0.483 preclip 0.3474 obj 0.000298 outside 52 1280s
+16:32:01 SAVED /data/cand_normgrad
+16:49:14 GATE_EVAL /data/cand_normgrad 1033s {"samples": 4000, "pass_rate": 0.8365, "capped": 0.1505, "load_s": 38.088733434677124, "gen_s": 983.6209111213684}
+16:49:16 GATE 7 203 RED z -4.94 diff -0.0225 cand 0.8365 head 0.8590 capped 0.150 accepted 0/7
+16:49:16 STEP 7 203 changed 24821760 real/int 0.556 cos 0.488 preclip 0.4108 obj 0.000408 outside 48 1088s
+16:50:06 SAVED /data/cand_normgrad
+17:06:38 GATE_EVAL /data/cand_normgrad 992s {"samples": 4000, "pass_rate": 0.858, "capped": 0.131, "load_s": 34.654459714889526, "gen_s": 946.7397184371948}
+17:06:39 GATE 8 204 RED z -0.22 diff -0.0010 cand 0.8580 head 0.8590 capped 0.131 accepted 0/8
+17:06:39 STEP 8 204 changed 24858523 real/int 0.544 cos 0.476 preclip 0.4100 obj 0.000326 outside 60 1044s
+17:07:26 SAVED /data/cand_normgrad
+17:24:24 GATE_EVAL /data/cand_normgrad 1018s {"samples": 4000, "pass_rate": 0.83925, "capped": 0.144, "load_s": 35.17299246788025, "gen_s": 972.0437860488892}
+17:24:25 GATE 9 205 RED z -4.08 diff -0.0198 cand 0.8393 head 0.8590 capped 0.144 accepted 0/9
+17:24:25 STEP 9 205 changed 24701390 real/int 0.558 cos 0.490 preclip 0.3211 obj 0.000338 outside 34 1066s
+17:25:15 SAVED /data/cand_normgrad
+17:46:28 GATE_EVAL /data/cand_normgrad 1273s {"samples": 4000, "pass_rate": 0.7695, "capped": 0.21675, "load_s": 36.03844714164734, "gen_s": 1225.9914474487305}
+17:46:30 GATE 10 206 RED z -13.78 diff -0.0895 cand 0.7695 head 0.8590 capped 0.217 accepted 0/10
+17:46:30 STEP 10 206 changed 24825108 real/int 0.550 cos 0.479 preclip 0.3516 obj 0.000372 outside 33 1325s
+17:47:25 SAVED /data/cand_normgrad
+18:02:20 GATE_EVAL /data/cand_normgrad 895s {"samples": 4000, "pass_rate": 0.87775, "capped": 0.10775, "load_s": 35.56605863571167, "gen_s": 847.214597940445}
+18:02:20 GATE 11 207 GREEN z +4.23 diff +0.0187 cand 0.8778 head 0.8590 capped 0.108 accepted 1/11
+18:02:20 STEP 11 207 changed 24717964 real/int 0.558 cos 0.489 preclip 0.3494 obj 0.000381 outside 70 950s
+18:03:14 SAVED /data/cand_normgrad
+18:19:16 GATE_EVAL /data/cand_normgrad 961s {"samples": 4000, "pass_rate": 0.86275, "capped": 0.1175, "load_s": 35.59147238731384, "gen_s": 912.8498401641846}
+18:19:17 GATE 12 208 RED z -3.45 diff -0.0150 cand 0.8628 head 0.8778 capped 0.117 accepted 1/12
+18:19:17 STEP 12 208 changed 30651559 real/int 0.667 cos 0.463 preclip 0.3120 obj 0.000311 outside 166 1017s
+18:20:08 SAVED /data/cand_normgrad
+18:35:20 GATE_EVAL /data/cand_normgrad 912s {"samples": 4000, "pass_rate": 0.883, "capped": 0.10375, "load_s": 34.68345069885254, "gen_s": 866.501980304718}
+18:35:20 GATE 13 209 GREEN z +1.36 diff +0.0053 cand 0.8830 head 0.8778 capped 0.104 accepted 2/13
+18:35:20 STEP 13 209 changed 30752901 real/int 0.667 cos 0.459 preclip 0.3032 obj 0.000275 outside 85 963s
+18:36:07 SAVED /data/cand_normgrad
+18:50:51 GATE_EVAL /data/cand_normgrad 884s {"samples": 4000, "pass_rate": 0.892, "capped": 0.09525, "load_s": 34.892181396484375, "gen_s": 838.8411073684692}
+18:50:51 GATE 14 210 GREEN z +2.32 diff +0.0090 cand 0.8920 head 0.8830 capped 0.095 accepted 3/14
+18:50:51 STEP 14 210 changed 33668691 real/int 0.732 cos 0.444 preclip 0.3269 obj 0.000285 outside 108 931s
+18:51:06 SNAP 14 {"ll_correct": -0.09735071659088135, "ll_wrong": -0.12372884899377823, "ll_capped": -1.0219757556915283, "logPS": -0.02706877328455448, "logPS_capped": -0.07138931751251221, "eos_think": 2.4939258764788974e-06} {"collapse_b1": 0.5179, "collapse_orig": 0.513}
+18:51:16 SAVED /data/models/gated_normgrad
+18:51:16 STREAM_DONE fp32_renorm

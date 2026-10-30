@@ -62,18 +62,48 @@ Two things to avoid: stochastic rounding, and fixing bf16 without fixes 1 and 3.
 
 We are happy to share the code (based on `replay_k1.py`) and all raw results.
 
-## Status: gated runs in progress (2026-10-29 15:45Z)
+## Update: with an official-style gate, and the trajectory on the gate set (2026-10-29)
 
-We are now rerunning the two fp32 + renormalization arms with an official-style gate on every step: 1,000 private tasks × 4 samples, common random numbers, accept if z > 0 and capped < 20%, and roll back the fp32 master on rejection. Early single-step results from 7fa0305a, on the gate set:
+**Gated runs.** We reran the two fp32 + renormalization arms with a gate on every step.
+- Gate: 1,000 private tasks × 4 samples, common random numbers, accept if z > 0 and capped < 20%. A rejected step rolls back both the bf16 weights and the fp32 master. The gate set does not overlap the batches or the held-out set, and its noise is about 1pp, the same as the live gate.
+- Fourteen steps, e197–e210. The table shows each candidate minus the current head on the gate set, in pp; A = accepted.
 
-| Batch | Gradient-direction step | Sign step |
-|---|---|---|
-| e197 | −1.3pp (z −2.7) RED | +0.03pp (z +0.06) GREEN |
-| e198 | −5.6pp (z −10.6) RED | −0.27pp (z −0.6) RED |
-| e199 | −7.0pp (z −11.5) RED | −0.85pp (z −1.95) RED |
+| Batch | 197 | 198 | 199 | 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 209 | 210 | Accepted |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gradient-direction step | −1.3 | −5.6 | −7.0 | −2.5 | −3.8 | −8.0 | −2.2 | −0.1 | −2.0 | −8.9 | **+1.9 A** | −1.5 | +0.5 A | +0.9 A | 3/14 |
+| Sign step | 0.0 A | −0.3 | −0.9 | −0.9 | −0.2 | −0.4 | −0.3 | +0.1 A | −0.6 | −0.2 | +0.1 A | −0.7 | −0.4 | +0.2 A | 4/14 |
 
-So single gradient-direction steps from this start are strongly negative, and their ranking across batches matches the sign arm's. That conflicts with the +5.6pp after 17 ungated steps, and the two possible reasons are not yet separated:
-- (a) batch quality varies and the later batches are the good ones;
-- (b) single gradient-direction steps overshoot, and the gain only appears when steps accumulate. In that case a per-step gate blocks the path.
+The first ten gradient-direction candidates were rejected, so e197–e207 are all single steps from the same start.
 
-The remaining gated steps will tell (a) from (b), and we will update this file. Until then, treat the "gradient-direction step" recommendation as provisional when it is combined with a per-step gate.
+**Ungated trajectory, scored on the gate set.** Same recipe, 17 steps, every step accepted:
+
+| Step | 0 | 1 | 3 | 6 | 10 | 17 |
+|---|---|---|---|---|---|---|
+| Gate-set pass | 85.9% | 83.7% | **68.1%** (capped 29.9%) | 88.3% | 89.4% | **90.0%** |
+
+**Held-out results** (750 tasks, paired on j=0 against the start, task-bootstrap 95% CI):
+
+| Recipe | Pass | vs start | Capped | Full-vocab: EOS, no answer |
+|---|---|---|---|---|
+| Start (7fa0305a) | 84.9% | — | 12.5% | 21.7% |
+| Random-sign control (noise floor) | 86.9% | +2.0 (−0.1, +4.3) | 11.5% | 22.1% |
+| Gated, sign step (4/14 accepted) | 87.1% | +2.1 (0.0, +4.1) | 10.8% | 22.4% |
+| **Gated, gradient-direction step (3/14 accepted)** | **88.7%** | **+3.7 (+1.5, +6.1)** | 8.1% | 12.4% |
+| Ungated, gradient-direction step (17 steps, rerun) | 88.9% | +4.0 (+2.0, +6.3) | 8.5% | 0.1% |
+
+**What this shows**
+
+1. **Single steps are not a reliable measure of batch quality.**
+   - From the same start, 10 of 11 batches give a negative single step; only e207 is positive.
+   - In the ungated run, the model drops to 68% at step 3 and is back at 88% by step 6. The batches that bring it back (e200–e202) each hurt when applied alone from the start.
+   - So a step's effect depends on the current state: the gradient-direction step overshoots, and later steps correct it.
+2. **A per-step gate works well with the gradient-direction step.**
+   - Only 3 of 14 steps pass, yet held-out improves by +3.7pp, close to the ungated +4.0pp.
+   - It never goes through the dip. The 68% state would have been a visible collapse if published.
+   - The cost: 11 of 14 batches are discarded, and only half of the full-vocab EOS tail is removed.
+3. **A gate plus the sign step does not train.** Every single step is within ±1pp, and the held-out change (+2.1pp) matches the random-sign noise floor.
+4. **The ungated recipe reproduces.** The rerun gives +4.0pp held-out (first run +5.6pp) and +4.1pp on the gate set.
+
+**Recommended setup, updated:** fp32 master kept across turns, support renormalization in the PG term, gradient-direction step, and the gate kept as a safety net. To waste fewer batches, the next things to try are a smaller step (less overshoot) or gating every few steps instead of every step.
+
+Raw logs for these runs are in `results/round3/`.

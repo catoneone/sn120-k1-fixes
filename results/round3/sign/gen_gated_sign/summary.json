@@ -1,0 +1,18 @@
+{
+ "trunc": {
+  "samples": 750,
+  "pass_rate": 0.8706666666666667,
+  "capped": 0.108,
+  "eos_no_answer": 0.0013333333333333333,
+  "median_tokens": 1127,
+  "seconds": 171.37884974479675
+ },
+ "full": {
+  "samples": 750,
+  "pass_rate": 0.7266666666666667,
+  "capped": 0.036,
+  "eos_no_answer": 0.224,
+  "median_tokens": 1216,
+  "seconds": 148.2374198436737
+ }
+}

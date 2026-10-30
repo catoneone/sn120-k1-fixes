@@ -1,0 +1,37 @@
+18:59:31 ARM fp32_renorm opt normgrad adv_pos False no_overlong False
+19:00:18 SNAP 0 {"ll_correct": -0.09264695644378662, "ll_wrong": -0.11486558616161346, "ll_capped": -1.0415818691253662, "logPS": -0.03506064414978027, "logPS_capped": -0.09496030956506729, "eos_think": 2.81388179246278e-06} {"collapse_b1": 0.0, "collapse_orig": 0.0}
+19:01:00 SAVED /data/cand_obs
+19:18:48 GATE_EVAL /data/cand_obs 1068s {"samples": 4000, "pass_rate": 0.83725, "capped": 0.15075, "load_s": 47.33024978637695, "gen_s": 1008.8921821117401}
+19:18:48 OBSERVE 1 197 vs start: z -4.38 diff -0.0217 pass 0.8373 capped 0.151
+19:18:48 STEP 1 197 changed 24660182 real/int 0.551 cos 0.483 preclip 0.3569 obj 0.000279 outside 8 1110s
+19:19:27 STEP 2 198 changed 31094170 real/int 0.646 cos 0.436 preclip 0.3609 obj 0.000261 outside 43 39s
+19:20:39 SAVED /data/cand_obs
+19:45:08 GATE_EVAL /data/cand_obs 1469s {"samples": 4000, "pass_rate": 0.6805, "capped": 0.299, "load_s": 34.679312229156494, "gen_s": 1423.3476905822754}
+19:45:08 OBSERVE 3 199 vs start: z -19.70 diff -0.1785 pass 0.6805 capped 0.299
+19:45:08 STEP 3 199 changed 33673325 real/int 0.721 cos 0.445 preclip 0.3380 obj 0.000290 outside 98 1541s
+19:45:48 STEP 4 200 changed 36388659 real/int 0.772 cos 0.425 preclip 0.3597 obj 0.000246 outside 123 40s
+19:47:10 STEP 5 201 changed 35584579 real/int 0.708 cos 0.367 preclip 1.8799 obj 0.000293 outside 370 82s
+19:48:07 SAVED /data/cand_obs
+20:03:34 GATE_EVAL /data/cand_obs 927s {"samples": 4000, "pass_rate": 0.88325, "capped": 0.10475, "load_s": 35.06830096244812, "gen_s": 880.8517253398895}
+20:03:34 OBSERVE 6 202 vs start: z +5.58 diff +0.0243 pass 0.8832 capped 0.105
+20:03:34 STEP 6 202 changed 37529399 real/int 0.809 cos 0.411 preclip 0.3331 obj 0.000294 outside 253 984s
+20:04:00 STEP 7 203 changed 39169627 real/int 0.873 cos 0.411 preclip 0.3506 obj 0.000310 outside 170 26s
+20:04:33 STEP 8 204 changed 39623479 real/int 0.896 cos 0.402 preclip 0.3422 obj 0.000238 outside 259 33s
+20:05:05 STEP 9 205 changed 40723233 real/int 0.924 cos 0.396 preclip 0.2252 obj 0.000207 outside 52 32s
+20:05:53 SAVED /data/cand_obs
+20:20:48 GATE_EVAL /data/cand_obs 895s {"samples": 4000, "pass_rate": 0.894, "capped": 0.09425, "load_s": 34.76513075828552, "gen_s": 849.0126514434814}
+20:20:48 OBSERVE 10 206 vs start: z +7.77 diff +0.0350 pass 0.8940 capped 0.094
+20:20:48 STEP 10 206 changed 41558706 real/int 0.940 cos 0.383 preclip 0.2892 obj 0.000204 outside 344 942s
+20:21:24 STEP 11 207 changed 41984260 real/int 0.991 cos 0.403 preclip 0.3700 obj 0.000292 outside 721 36s
+20:22:07 STEP 12 208 changed 42991553 real/int 1.032 cos 0.389 preclip 0.3072 obj 0.000319 outside 750 43s
+20:22:42 STEP 13 209 changed 43034999 real/int 1.010 cos 0.369 preclip 0.3051 obj 0.000209 outside 88 35s
+20:23:13 STEP 14 210 changed 43818209 real/int 1.068 cos 0.379 preclip 0.3741 obj 0.000336 outside 432 31s
+20:23:45 STEP 15 211 changed 44434152 real/int 1.067 cos 0.361 preclip 0.3619 obj 0.000322 outside 412 32s
+20:24:22 STEP 16 212 changed 44722079 real/int 1.080 cos 0.361 preclip 0.3656 obj 0.000435 outside 409 37s
+20:25:34 SAVED /data/cand_obs
+20:40:41 GATE_EVAL /data/cand_obs 906s {"samples": 4000, "pass_rate": 0.8995, "capped": 0.08925, "load_s": 35.40540528297424, "gen_s": 860.1884672641754}
+20:40:41 OBSERVE 17 213 vs start: z +8.14 diff +0.0405 pass 0.8995 capped 0.089
+20:40:41 STEP 17 213 changed 45396409 real/int 1.104 cos 0.359 preclip 0.3505 obj 0.000572 outside 1730 979s
+20:40:55 SNAP 17 {"ll_correct": -0.11083130538463593, "ll_wrong": -0.13738054037094116, "ll_capped": -1.0935417413711548, "logPS": -0.012351680546998978, "logPS_capped": -0.027725497260689735, "eos_think": 1.680637296885834e-06} {"collapse_b1": 0.5656, "collapse_orig": 0.5505}
+20:41:06 SAVED /data/models/observe_normgrad
+20:41:06 STREAM_DONE fp32_renorm
