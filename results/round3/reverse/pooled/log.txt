@@ -1,0 +1,20 @@
+07:44:10 GRAD 197 preclip 0.3569 outside 8
+07:44:48 GRAD 198 preclip 0.3649 outside 21
+07:45:40 GRAD 199 preclip 0.3577 outside 86
+07:46:19 GRAD 200 preclip 0.3598 outside 47
+07:47:51 GRAD 201 preclip 0.2626 outside 106
+07:48:30 GRAD 202 preclip 0.3465 outside 52
+07:48:45 SAVED /data/cand_pool
+08:09:30 GRAD 197 preclip 0.3571 outside 8
+08:10:06 GRAD 198 preclip 0.3650 outside 21
+08:10:54 GRAD 199 preclip 0.3577 outside 86
+08:11:34 GRAD 200 preclip 0.3597 outside 47
+08:12:54 GRAD 201 preclip 0.2630 outside 106
+08:13:28 GRAD 202 preclip 0.3475 outside 52
+08:14:04 SAVED /data/cand_pool
+08:36:53 GATE_EVAL /data/cand_pool 1369s {"samples": 4000, "pass_rate": 0.713, "capped": 0.26525, "load_s": 49.59023690223694, "gen_s": 1308.2169680595398}
+08:36:53 POOLED 6 turns 197-202 x1 vs start: z -18.38 diff -0.1460 pass 0.7130 capped 0.265
+08:37:12 SAVED /data/cand_pool
+09:06:59 GATE_EVAL /data/cand_pool 1787s {"samples": 4000, "pass_rate": 0.602, "capped": 0.331, "load_s": 35.1649010181427, "gen_s": 1741.3111579418182}
+09:06:59 POOLED 6 turns 197-202 x4 vs start: z -25.66 diff -0.2570 pass 0.6020 capped 0.331
+09:07:00 POOLED_DONE

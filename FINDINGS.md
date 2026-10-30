@@ -122,3 +122,16 @@ Raw logs for these runs are in `results/round3/`.
 - **Both orders end up at about the same place.** So whether a batch counts as "good" depends mostly on the state it lands on, not on the batch itself.
 - **Paying miners for single-step gate wins therefore rewards queue position more than data quality.** A per-miner turn that applies a larger batch as several sub-steps, and is judged only at its end, would give a cleaner signal.
 
+**One big step vs. a chain.** We also tested applying the six batches e197–e202 as a single step from the start: each batch's clipped gradient computed at the start, averaged, then one gradient-direction step. Scored on the gate set against the start (85.9%):
+
+| Update | Gate-set pass | vs start |
+|---|---|---|
+| Six batches as a chain of 6 steps (ungated) | 88.3% | +2.4pp |
+| Six batches pooled into one step, 1× step | 71.3% | −14.6pp (z −18.4) |
+| Six batches pooled into one step, 4× step | 60.2% | −25.7pp |
+| Each batch alone, one step from the start | — | −1.3 to −8.0pp |
+
+**What this means**
+- **The pooled step is worse than any single batch.** Averaging cancels the batch-specific noise and keeps the shared direction, and from the start that shared direction pushes toward the length cap.
+- **The gain comes only from chaining.** After each step the state changes, and the next gradient corrects the overshoot.
+- **For a mechanism with larger per-miner batches:** apply the batch as a chain of sub-steps and judge the turn at its end, not as one big step.
