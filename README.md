@@ -1,6 +1,6 @@
 # SN120 K=1 training: sampler mismatch, bf16 rounding, sign step
 
-This bundle contains the findings, the arm code (EXP-022/023), the 750-task held-out set and the exact sampling settings. Start with `FINDINGS.md`.
+This bundle contains the findings, the arm code (EXP-022/023), the 750-task held-out set and the exact sampling settings. Start with `FINDINGS.md`. The grader issue (correct answers scored 0) is in `VERIFIER.md`.
 
 | Path | What it is |
 |---|---|
@@ -9,12 +9,14 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | `code/bf16_exp.py` | All arms. Built on your `replay_k1.py`: same rows, KL reference pass, gradient pass, clip, fresh-AdamW step and per-tensor cap; only the last step changes |
 | `code/gen_heldout.py` | Held-out generation and grading (vLLM) |
 | `code/gate_eval.py` | Official-style gate eval used in the gated runs (1,000 tasks × 4) |
-| `code/fetch_k1.py` | Downloads `/k1/turns/<e>/turn.json` and the batch documents (by sha256) |
+| `code/fetch_k1.py` | Downloads `/k1/turns/<e>/turn.json` and the batch documents (by sha256); epochs without a turn are skipped |
+| `VERIFIER.md`, `code/lenient_grader.py` | The affine_math grader scores 481 correct finished answers as 0 in e196–e260. The script reproduces the live projection + `verify.py` (0 mismatches on 4,073 rollouts) and measures nine deterministic fixes |
 | `code/gated.sh`, `code/summarize.py` | Gated-run driver; results summary |
 | `EXPERIMENT-2x2.md`, `code/run_2x2.sh` | Head × batch 2×2 on 7fa0305a / 6b16e298, plus the extra 6b16e298 arms: one command, pre-registered decision rules |
 | `data/heldout.json` | The 750 held-out tasks: `index`, `prompt_ids`, `answer`, `level`, `subject` |
 | `data/gate.json` | The 1,000-task gate set used in the gated runs (same format) |
 | `data/gate_B.json` | The 977 tasks of `gate.json` not used in any batch e196–e245 (live-head runs and the 2×2) |
+| `results/verifier/regression.json` | Grader regression: label matrices before and after the fixes, counts per fix, every changed (task, fix) with the answers |
 | `results/` | Per-arm step logs (`steps.jsonl`), fixed-text probes (`snapshots.jsonl`), single-step results (`stage1/`), and per-sample generation results (`gen_*/trunc.jsonl`, `full.jsonl`, `summary.json`) |
 
 ## Held-out set

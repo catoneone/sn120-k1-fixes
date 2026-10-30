@@ -26,7 +26,13 @@ def main():
     for e in range(lo, hi + 1):
         tp = out / 'turns' / f'{e}.json'
         if not tp.exists():
-            curl(f'{BASE}/k1/turns/{e}/turn.json', tp)
+            try:
+                curl(f'{BASE}/k1/turns/{e}/turn.json', tp)
+            except subprocess.CalledProcessError:
+                # Some epochs have no turn (e.g. an abandoned pre-opened epoch); skip them.
+                tp.unlink(missing_ok=True)
+                print('K1', e, 'no turn, skipped', flush=True)
+                continue
         turn = json.loads(tp.read_text())
         n = 0
         for row in turn['dispatch']['selected']:

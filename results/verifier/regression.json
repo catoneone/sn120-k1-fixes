@@ -1,0 +1,1496 @@
+{
+ "scope": {
+  "epochs": "196-260",
+  "n_epochs": 58,
+  "documents": 544,
+  "rollouts": 4352,
+  "completed_rollouts": 4073
+ },
+ "reproduction": {
+  "live_vs_reproduced": {
+   "negative->negative": 779,
+   "neutral->neutral": 228,
+   "positive->positive": 3066
+  },
+  "mismatches": 0
+ },
+ "after_fixes": {
+  "live_vs_fixed": {
+   "negative->negative": 489,
+   "negative->positive": 290,
+   "neutral->negative": 19,
+   "neutral->neutral": 18,
+   "neutral->positive": 191,
+   "positive->positive": 3066
+  },
+  "changed_by_fix": {
+   "neutral->positive via P2": 156,
+   "negative->positive via E1": 81,
+   "negative->positive via E3": 68,
+   "negative->positive via E4": 48,
+   "neutral->positive via P1": 34,
+   "negative->positive via E6": 34,
+   "negative->positive via E7": 33,
+   "negative->positive via E5": 26,
+   "neutral->negative via P2": 17,
+   "neutral->negative via P1": 2,
+   "neutral->positive via P2+E3": 1
+  },
+  "format_violations_kept_for_penalty": {
+   "tail": 75,
+   "n_boxed": 23,
+   "think": 91,
+   "prefix": 3
+  }
+ },
+ "flips": [
+  {
+   "task": 6119,
+   "gold": "\\text{A, B}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "A,B": 26
+   }
+  },
+  {
+   "task": 4135,
+   "gold": "D, E",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "\\text{D, E}": 13
+   }
+  },
+  {
+   "task": 6383,
+   "gold": "\\text{Softball, Kickball, Picnic}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "Softball, Kickball, Picnic": 12
+   }
+  },
+  {
+   "task": 3439,
+   "gold": "\\text{A, D, F, G, H}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "A, D, F, G, H": 11
+   }
+  },
+  {
+   "task": 1905,
+   "gold": "\\dfrac{1}{29,\\!322,\\!216}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "\\frac{1}{29322216}": 6,
+    "\\dfrac{1}{29322216}": 1
+   }
+  },
+  {
+   "task": 4456,
+   "gold": "\\text{B,C}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "B, C": 4,
+    "B,C": 3
+   }
+  },
+  {
+   "task": 5565,
+   "gold": "\\text{A,B}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "A,B": 4
+   }
+  },
+  {
+   "task": 4876,
+   "gold": "\\text{October 30}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E1",
+   "answers": {
+    "October 30": 1
+   }
+  },
+  {
+   "task": 5443,
+   "gold": "119",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E3",
+   "answers": {
+    "C": 32,
+    "\\text{C}": 4
+   }
+  },
+  {
+   "task": 3138,
+   "gold": "\\frac{bx}{h}(h-x)",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E3",
+   "answers": {
+    "\\text{(A)}\\ \\frac{bx}{h}(h-x)": 8,
+    "\\textbf{(A)}\\ \\frac{bx}{h}(h-x)": 3,
+    "\\text{(A)}": 1,
+    "\\text{(A) } \\frac{bx}{h}(h-x)": 1
+   }
+  },
+  {
+   "task": 3129,
+   "gold": "1:4",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E3",
+   "answers": {
+    "\\text{(D)}": 3,
+    "D": 2,
+    "\\text{(D)}\\ 1:4": 2
+   }
+  },
+  {
+   "task": 3134,
+   "gold": "s^2 \\le 8r^2",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E3",
+   "answers": {
+    "\\text{(A)}": 2,
+    "A": 2,
+    "\\text{A}": 1,
+    "(\\text{A})": 1
+   }
+  },
+  {
+   "task": 5339,
+   "gold": "1",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E3",
+   "answers": {
+    "B": 5
+   }
+  },
+  {
+   "task": 3137,
+   "gold": "3:1",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E3",
+   "answers": {
+    "\\textbf{(D)}\\ 3:1": 1
+   }
+  },
+  {
+   "task": 7303,
+   "gold": "\\begin{pmatrix} 6 \\\\ -17 \\end{pmatrix}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E4",
+   "answers": {
+    "(6, -17)": 23,
+    "(6,-17)": 1
+   }
+  },
+  {
+   "task": 7009,
+   "gold": "\\begin{pmatrix} 7 \\\\ -8 \\end{pmatrix}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E4",
+   "answers": {
+    "(7, -8)": 23,
+    "(7,\\ -8)": 1
+   }
+  },
+  {
+   "task": 6755,
+   "gold": "(-\\infty,3) \\cup (3,\\infty)",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E5",
+   "answers": {
+    "a \\neq 3": 12
+   }
+  },
+  {
+   "task": 3520,
+   "gold": "\\left( -\\infty, -\\frac{1}{5} \\right)",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E5",
+   "answers": {
+    "k < -\\frac{1}{5}": 12
+   }
+  },
+  {
+   "task": 4429,
+   "gold": "(2,4)",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E5",
+   "answers": {
+    "2 < x < 4": 2
+   }
+  },
+  {
+   "task": 7409,
+   "gold": "\\begin{pmatrix} -5 & 0 \\\\ 0 & -5 \\end{pmatrix}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E6",
+   "answers": {
+    "-5\\mathbf{I}": 27,
+    "-5I": 7
+   }
+  },
+  {
+   "task": 7163,
+   "gold": "-32 + 32i \\sqrt{3}",
+   "live": "negative",
+   "fixed": "positive",
+   "fix": "E7",
+   "answers": {
+    "-32 + 32\\sqrt{3}i": 33
+   }
+  },
+  {
+   "task": 6161,
+   "gold": "30-8p",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "30 - 8p": 4,
+    "30-8p": 1
+   }
+  },
+  {
+   "task": 5888,
+   "gold": "\\$30",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "30": 4
+   }
+  },
+  {
+   "task": 5689,
+   "gold": "10",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "10": 3
+   }
+  },
+  {
+   "task": 1393,
+   "gold": "-55",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "-55": 2
+   }
+  },
+  {
+   "task": 6394,
+   "gold": "30",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "30": 2
+   }
+  },
+  {
+   "task": 5918,
+   "gold": "2\\frac{1}{2}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "2.5": 2
+   }
+  },
+  {
+   "task": 1774,
+   "gold": "162",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "162": 1
+   }
+  },
+  {
+   "task": 1950,
+   "gold": "25200",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "25200": 1
+   }
+  },
+  {
+   "task": 5114,
+   "gold": "47",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "47": 1
+   }
+  },
+  {
+   "task": 3339,
+   "gold": "\\frac{7}{8}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "\\frac{7}{8}": 1
+   }
+  },
+  {
+   "task": 4769,
+   "gold": "86",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "86": 1
+   }
+  },
+  {
+   "task": 1222,
+   "gold": "144",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "144": 1
+   }
+  },
+  {
+   "task": 6453,
+   "gold": "\\frac{1}{20}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "\\frac{1}{20}": 1
+   }
+  },
+  {
+   "task": 3967,
+   "gold": "-\\frac{11}{6}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "-\\frac{11}{6}": 1
+   }
+  },
+  {
+   "task": 5687,
+   "gold": "26",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "26": 1
+   }
+  },
+  {
+   "task": 4061,
+   "gold": "y = -\\frac{47}{8}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "y = -\\frac{47}{8}": 1
+   }
+  },
+  {
+   "task": 1069,
+   "gold": "6z^5+15z^4-22z^3-8z^2+17z-6",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "6z^5 + 15z^4 - 22z^3 - 8z^2 + 17z - 6": 1
+   }
+  },
+  {
+   "task": 59,
+   "gold": "\\frac{9}{2}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "\\frac{9}{2}": 1
+   }
+  },
+  {
+   "task": 463,
+   "gold": "y=-2x+1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "y=-2x+1": 1
+   }
+  },
+  {
+   "task": 5674,
+   "gold": "36",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "36": 1
+   }
+  },
+  {
+   "task": 5624,
+   "gold": "7",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "7": 1
+   }
+  },
+  {
+   "task": 6548,
+   "gold": "18",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P1",
+   "answers": {
+    "12": 1
+   }
+  },
+  {
+   "task": 6442,
+   "gold": "32",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P1",
+   "answers": {
+    "64": 1
+   }
+  },
+  {
+   "task": 6580,
+   "gold": "34",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P1",
+   "answers": {
+    "34": 1
+   }
+  },
+  {
+   "task": 107,
+   "gold": "\\frac14",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{1}{4}": 15,
+    "\\frac14": 8
+   }
+  },
+  {
+   "task": 846,
+   "gold": "0",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "0": 11
+   }
+  },
+  {
+   "task": 5637,
+   "gold": "\\text{Wednesday}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "Wednesday": 5
+   }
+  },
+  {
+   "task": 2914,
+   "gold": "10\\sqrt{2}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "10\\sqrt{2}": 5
+   }
+  },
+  {
+   "task": 828,
+   "gold": "\\$347",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\$347": 4,
+    "347": 1
+   }
+  },
+  {
+   "task": 2094,
+   "gold": "58",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "58": 4
+   }
+  },
+  {
+   "task": 4472,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 3
+   }
+  },
+  {
+   "task": 451,
+   "gold": "(-\\infty,-4)\\cup (4,\\infty)",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "(-\\infty, -4) \\cup (4, \\infty)": 3
+   }
+  },
+  {
+   "task": 5208,
+   "gold": "29",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "29": 3
+   }
+  },
+  {
+   "task": 1085,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 3
+   }
+  },
+  {
+   "task": 7305,
+   "gold": "\\left[ -1, \\frac{1}{\\sqrt{2}} \\right)",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "[-1, \\frac{\\sqrt{2}}{2})": 3
+   }
+  },
+  {
+   "task": 1145,
+   "gold": "\\sqrt{6}-1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\sqrt{6}-1": 3
+   }
+  },
+  {
+   "task": 4061,
+   "gold": "y = -\\frac{47}{8}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "y = -\\frac{47}{8}": 3
+   }
+  },
+  {
+   "task": 6762,
+   "gold": "\\begin{pmatrix} 1 & 0 \\\\ 0 & 3 \\end{pmatrix}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\begin{pmatrix} 1 & 0 \\\\ 0 & 3 \\end{pmatrix}": 3
+   }
+  },
+  {
+   "task": 5062,
+   "gold": "3",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "3": 2
+   }
+  },
+  {
+   "task": 1393,
+   "gold": "-55",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "-55": 2
+   }
+  },
+  {
+   "task": 4036,
+   "gold": "86",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "86": 2
+   }
+  },
+  {
+   "task": 6173,
+   "gold": "b = -4",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "-4": 2
+   }
+  },
+  {
+   "task": 6241,
+   "gold": "163",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "163": 2
+   }
+  },
+  {
+   "task": 3012,
+   "gold": "36\\pi",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "36\\pi": 2
+   }
+  },
+  {
+   "task": 5689,
+   "gold": "10",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "10": 2
+   }
+  },
+  {
+   "task": 4938,
+   "gold": "10001_2",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "10001": 2
+   }
+  },
+  {
+   "task": 3554,
+   "gold": "17",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "17": 2
+   }
+  },
+  {
+   "task": 2450,
+   "gold": "24310",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "24310": 2
+   }
+  },
+  {
+   "task": 6582,
+   "gold": "6",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "4": 1,
+    "7": 1
+   }
+  },
+  {
+   "task": 7014,
+   "gold": "\\begin{pmatrix} -2 & -7 \\\\ 5 & -7 \\end{pmatrix}",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "-2 & -7 \\\\ 5 & -7": 2
+   }
+  },
+  {
+   "task": 5339,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 2
+   }
+  },
+  {
+   "task": 849,
+   "gold": "2",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "2": 1
+   }
+  },
+  {
+   "task": 468,
+   "gold": "3",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "3": 1
+   }
+  },
+  {
+   "task": 2020,
+   "gold": "819",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "819": 1
+   }
+  },
+  {
+   "task": 5205,
+   "gold": "\\$30",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "90": 1
+   }
+  },
+  {
+   "task": 4108,
+   "gold": "\\frac{50}{101}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{50}{101}": 1
+   }
+  },
+  {
+   "task": 4829,
+   "gold": "42",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "42": 1
+   }
+  },
+  {
+   "task": 5627,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 1001,
+   "gold": "4",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "4": 1
+   }
+  },
+  {
+   "task": 4472,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "6": 1
+   }
+  },
+  {
+   "task": 5212,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 758,
+   "gold": "\\frac43",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{4}{3}": 1
+   }
+  },
+  {
+   "task": 5211,
+   "gold": "2",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "2": 1
+   }
+  },
+  {
+   "task": 2842,
+   "gold": "10\\text{ inches}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "10": 1
+   }
+  },
+  {
+   "task": 21,
+   "gold": "2",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "2": 1
+   }
+  },
+  {
+   "task": 6715,
+   "gold": "\\frac{1}{8}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{1}{8}": 1
+   }
+  },
+  {
+   "task": 6697,
+   "gold": "6",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "6": 1
+   }
+  },
+  {
+   "task": 3290,
+   "gold": "10\\pi",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "10\\pi": 1
+   }
+  },
+  {
+   "task": 4368,
+   "gold": "(4, \\infty)",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "(4,\\infty)": 1
+   }
+  },
+  {
+   "task": 6442,
+   "gold": "32",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "32": 1
+   }
+  },
+  {
+   "task": 5029,
+   "gold": "8",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "4": 1
+   }
+  },
+  {
+   "task": 5006,
+   "gold": "31",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "31": 1
+   }
+  },
+  {
+   "task": 3452,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 7182,
+   "gold": "30",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "30": 1
+   }
+  },
+  {
+   "task": 6392,
+   "gold": "10",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "10": 1
+   }
+  },
+  {
+   "task": 976,
+   "gold": "2435",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "2435": 1
+   }
+  },
+  {
+   "task": 6726,
+   "gold": "7",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "7": 1
+   }
+  },
+  {
+   "task": 5062,
+   "gold": "3",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "2": 1
+   }
+  },
+  {
+   "task": 4576,
+   "gold": "19",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "19": 1
+   }
+  },
+  {
+   "task": 4061,
+   "gold": "y = -\\frac{47}{8}",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "y = -6": 1
+   }
+  },
+  {
+   "task": 23,
+   "gold": "9",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "9": 1
+   }
+  },
+  {
+   "task": 2914,
+   "gold": "10\\sqrt{2}",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "5\\sqrt{2}": 1
+   }
+  },
+  {
+   "task": 795,
+   "gold": "60",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "60": 1
+   }
+  },
+  {
+   "task": 3513,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 4690,
+   "gold": "9981",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "9981": 1
+   }
+  },
+  {
+   "task": 4195,
+   "gold": "-\\frac{5}{4}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "-\\frac{5}{4}": 1
+   }
+  },
+  {
+   "task": 1975,
+   "gold": "448",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "448": 1
+   }
+  },
+  {
+   "task": 1044,
+   "gold": "35",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "35": 1
+   }
+  },
+  {
+   "task": 5048,
+   "gold": "24",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "24": 1
+   }
+  },
+  {
+   "task": 7190,
+   "gold": "\\frac{241}{243}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{241}{243}": 1
+   }
+  },
+  {
+   "task": 4945,
+   "gold": "8820",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "8820": 1
+   }
+  },
+  {
+   "task": 6887,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 4799,
+   "gold": "\\frac{101}{198}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{101}{198}": 1
+   }
+  },
+  {
+   "task": 4577,
+   "gold": "\\frac{1}{2}",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "\\!-\\tfrac{1}{2^{2}4}\\psi^{2}": 1
+   }
+  },
+  {
+   "task": 3411,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 528,
+   "gold": "63\\pi",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "63\\pi": 1
+   }
+  },
+  {
+   "task": 528,
+   "gold": "63\\pi",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "169\\pi": 1
+   }
+  },
+  {
+   "task": 1421,
+   "gold": "193",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "193": 1
+   }
+  },
+  {
+   "task": 1421,
+   "gold": "193",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "-16": 1
+   }
+  },
+  {
+   "task": 1516,
+   "gold": "-9",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "-9": 1
+   }
+  },
+  {
+   "task": 1516,
+   "gold": "-9",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "5": 1
+   }
+  },
+  {
+   "task": 6265,
+   "gold": "132",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "132": 1
+   }
+  },
+  {
+   "task": 6548,
+   "gold": "18",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "12": 1
+   }
+  },
+  {
+   "task": 7075,
+   "gold": "\\begin{pmatrix} 5/13 & 12/13 \\\\ 12/13 & -5/13 \\end{pmatrix}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\begin{pmatrix} \\frac{5}{13} & \\frac{12}{13} \\\\ \\frac{12}{13} & -\\frac{5}{13} \\end{pmatrix}": 1
+   }
+  },
+  {
+   "task": 1548,
+   "gold": "\\left[-3,-\\frac{4}{3}\\right)",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\n\\left[-3,-\\frac{4}{3}\\right)\n": 1
+   }
+  },
+  {
+   "task": 1905,
+   "gold": "\\dfrac{1}{29,\\!322,\\!216}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{1}{29,322,216}": 1
+   }
+  },
+  {
+   "task": 3436,
+   "gold": "3",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "3": 1
+   }
+  },
+  {
+   "task": 4456,
+   "gold": "\\text{B,C}",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "C, D": 1
+   }
+  },
+  {
+   "task": 549,
+   "gold": "15",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "15": 1
+   }
+  },
+  {
+   "task": 1192,
+   "gold": "\\frac{1}{2}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "\\frac{1}{2}": 1
+   }
+  },
+  {
+   "task": 5888,
+   "gold": "\\$30",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "30": 1
+   }
+  },
+  {
+   "task": 2506,
+   "gold": "25",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "25": 1
+   }
+  },
+  {
+   "task": 5029,
+   "gold": "8",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "8": 1
+   }
+  },
+  {
+   "task": 2417,
+   "gold": "111",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "111": 1
+   }
+  },
+  {
+   "task": 484,
+   "gold": "-\\frac{15}{2}",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "-\\frac{15}{2}": 1
+   }
+  },
+  {
+   "task": 1377,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 228,
+   "gold": "121",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "121": 1
+   }
+  },
+  {
+   "task": 5082,
+   "gold": "99997",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "99997": 1
+   }
+  },
+  {
+   "task": 594,
+   "gold": "5",
+   "live": "neutral",
+   "fixed": "negative",
+   "fix": "P2",
+   "answers": {
+    "10": 1
+   }
+  },
+  {
+   "task": 5715,
+   "gold": "240",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "240": 1
+   }
+  },
+  {
+   "task": 696,
+   "gold": "1",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2",
+   "answers": {
+    "1": 1
+   }
+  },
+  {
+   "task": 5443,
+   "gold": "119",
+   "live": "neutral",
+   "fixed": "positive",
+   "fix": "P2+E3",
+   "answers": {
+    "C": 1
+   }
+  }
+ ]
+}
