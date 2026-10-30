@@ -1,0 +1,21 @@
+06:08:59 ARM fp32_renorm opt normgrad adv_pos False no_overlong False
+06:09:56 SNAP 0 {"ll_correct": -0.0791233628988266, "ll_wrong": -0.07825613021850586, "ll_capped": 0.0, "logPS": -0.003700175089761615, "logPS_capped": 0.0, "eos_think": 0.00019831335521303117} {"collapse_b1": 0.0, "collapse_orig": 0.0}
+06:28:16 GATE_EVAL /data/models/1636928e 1100s {"samples": 3908, "pass_rate": 0.8410951893551689, "capped": 0.14662231320368474, "load_s": 156.85668921470642, "gen_s": 921.928041934967}
+06:31:42 SAVED /data/cand_B_normgrad
+06:54:18 GATE_EVAL /data/cand_B_normgrad 1356s {"samples": 3908, "pass_rate": 0.6867963152507677, "capped": 0.2947799385875128, "load_s": 63.20552110671997, "gen_s": 1280.1221182346344}
+06:54:18 OBSERVE 1 240 vs start: z -19.32 diff -0.1543 pass 0.6868 capped 0.295
+06:54:18 STEP 1 240 changed 24595161 real/int 0.565 cos 0.496 preclip 0.3952 obj 0.000457 outside 84 1562s
+06:55:31 STEP 2 241 changed 29659697 real/int 0.622 cos 0.439 preclip 0.3998 obj 0.000252 outside 84 73s
+06:57:37 SAVED /data/cand_B_normgrad
+07:12:03 GATE_EVAL /data/cand_B_normgrad 866s {"samples": 3908, "pass_rate": 0.8822927328556807, "capped": 0.10542476970317298, "load_s": 49.46139097213745, "gen_s": 805.0168437957764}
+07:12:03 OBSERVE 3 242 vs start: z +8.27 diff +0.0412 pass 0.8823 capped 0.105
+07:12:03 STEP 3 242 changed 33998800 real/int 0.705 cos 0.434 preclip 0.5024 obj 0.000446 outside 671 993s
+07:12:41 STEP 4 243 changed 38220182 real/int 0.766 cos 0.387 preclip 0.7529 obj 0.000312 outside 845 38s
+07:13:33 STEP 5 244 changed 38771123 real/int 0.836 cos 0.410 preclip 0.5225 obj 0.000559 outside 1999 52s
+07:15:17 SAVED /data/cand_B_normgrad
+07:29:50 GATE_EVAL /data/cand_B_normgrad 873s {"samples": 3908, "pass_rate": 0.8784544524053224, "capped": 0.10798362333674513, "load_s": 49.65593981742859, "gen_s": 811.8768961429596}
+07:29:50 OBSERVE 6 245 vs start: z +7.26 diff +0.0374 pass 0.8785 capped 0.108
+07:29:50 STEP 6 245 changed 40375735 real/int 0.832 cos 0.356 preclip 1.5098 obj 0.006592 outside 6665 976s
+07:29:53 SNAP 6 {"ll_correct": -0.10195016115903854, "ll_wrong": -0.11863848567008972, "ll_capped": 0.0, "logPS": -0.006978411693125963, "logPS_capped": 0.0, "eos_think": 0.00015915896801743656} {"collapse_b1": 0.4241, "collapse_orig": 0.4492}
+07:31:04 SAVED /data/models/chain_B_normgrad
+07:31:04 STREAM_DONE fp32_renorm

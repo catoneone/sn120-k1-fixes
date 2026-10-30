@@ -135,3 +135,18 @@ Raw logs for these runs are in `results/round3/`.
 - **The pooled step is worse than any single batch.** Averaging cancels the batch-specific noise and keeps the shared direction, and from the start that shared direction pushes toward the length cap.
 - **The gain comes only from chaining.** After each step the state changes, and the next gradient corrects the overshoot.
 - **For a mechanism with larger per-miner batches:** apply the batch as a chain of sub-steps and judge the turn at its end, not as one big step.
+
+**From the live head 1636928e, and two step variants** (ungated, 6 steps on e240–e245, which were sampled from this head; gate set of 977 tasks × 4, start 84.1%):
+
+| Step | Gradient-direction | Per-row normalized + capped embed / lm_head | Per-element clip at 4× the sign step |
+|---|---|---|---|
+| 1 (e240) | 68.7% (−15.4) | 68.8% (−15.3) | **84.0% (−0.1)** |
+| 3 (e242) | **88.2% (+4.1)** | **88.4% (+4.3)** | 84.2% (+0.05) |
+| 6 (e245) | **87.8% (+3.7)** | **88.1% (+4.0)** | 82.2% (−1.9) |
+
+- **The gradient-direction step does not collapse from this head.** It dips and then recovers to +4pp by step 3, as it did from 7fa0305a, so it does not reproduce the 6b16e298 / e226–e235 collapse.
+  - In the public turn files, the batches that came right after the dip in that chain (e229–e231) push toward *longer* answers. The batches after the dip in our chains push toward finishing.
+  - Stale replayed batches cannot react to the dip; on-policy batches, or a gate, would.
+- **Per-row capping changes nothing.** The dip does not come from the high-frequency formatting rows of embed or lm_head, so my earlier guess was wrong.
+- **Per-element clipping removes the dip and the gain together.** It ends slightly negative, much like a sign step: the few large-moving elements cause both the overshoot and the later improvement.
+- **We found no simple step-size fix that avoids the overshoot and still learns.** The safest options remain the gradient-direction step with a gate, or a per-miner chain of sub-steps judged at its end.

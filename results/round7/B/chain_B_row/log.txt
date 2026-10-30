@@ -1,0 +1,20 @@
+07:31:14 ARM fp32_renorm opt normgrad_row adv_pos False no_overlong False
+07:32:05 SNAP 0 {"ll_correct": -0.0791233628988266, "ll_wrong": -0.07825613021850586, "ll_capped": 0.0, "logPS": -0.003700175089761615, "logPS_capped": 0.0, "eos_think": 0.00019831335521303117} {"collapse_b1": 0.0, "collapse_orig": 0.0}
+07:34:08 SAVED /data/cand_B_row
+07:56:34 GATE_EVAL /data/cand_B_row 1346s {"samples": 3908, "pass_rate": 0.6878198567041965, "capped": 0.2960593654042989, "load_s": 62.95595598220825, "gen_s": 1270.8797783851624}
+07:56:34 OBSERVE 1 240 vs start: z -18.97 diff -0.1533 pass 0.6878 capped 0.296
+07:56:34 STEP 1 240 changed 24648755 real/int 0.563 cos 0.495 preclip 0.3953 obj 0.000457 outside 84 1469s
+07:57:34 STEP 2 241 changed 29762433 real/int 0.619 cos 0.438 preclip 0.4177 obj 0.000246 outside 82 61s
+07:59:33 SAVED /data/cand_B_row
+08:13:41 GATE_EVAL /data/cand_B_row 848s {"samples": 3908, "pass_rate": 0.8840839303991812, "capped": 0.1041453428863869, "load_s": 48.31950235366821, "gen_s": 788.4669010639191}
+08:13:41 OBSERVE 3 242 vs start: z +8.79 diff +0.0430 pass 0.8841 capped 0.104
+08:13:41 STEP 3 242 changed 34037440 real/int 0.700 cos 0.434 preclip 0.4715 obj 0.000438 outside 613 966s
+08:14:19 STEP 4 243 changed 38257326 real/int 0.761 cos 0.387 preclip 0.7068 obj 0.000307 outside 803 38s
+08:15:02 STEP 5 244 changed 39101346 real/int 0.837 cos 0.408 preclip 0.6017 obj 0.000509 outside 2292 44s
+08:16:37 SAVED /data/cand_B_row
+08:31:03 GATE_EVAL /data/cand_B_row 866s {"samples": 3908, "pass_rate": 0.8810133060388946, "capped": 0.10440122824974411, "load_s": 48.08108854293823, "gen_s": 805.9111306667328}
+08:31:03 OBSERVE 6 245 vs start: z +7.90 diff +0.0399 pass 0.8810 capped 0.104
+08:31:03 STEP 6 245 changed 40774686 real/int 0.833 cos 0.354 preclip 1.5938 obj 0.006233 outside 6471 961s
+08:31:06 SNAP 6 {"ll_correct": -0.10402464121580124, "ll_wrong": -0.11153671145439148, "ll_capped": 0.0, "logPS": -0.007400437258183956, "logPS_capped": 0.0, "eos_think": 0.00012707595305982977} {"collapse_b1": 0.4254, "collapse_orig": 0.4482}
+08:32:17 SAVED /data/models/chain_B_row
+08:32:17 STREAM_DONE fp32_renorm
