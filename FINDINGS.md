@@ -107,3 +107,18 @@ The first ten gradient-direction candidates were rejected, so e197–e207 are al
 **Recommended setup, updated:** fp32 master kept across turns, support renormalization in the PG term, gradient-direction step, and the gate kept as a safety net. To waste fewer batches, the next things to try are a smaller step (less overshoot) or gating every few steps instead of every step.
 
 Raw logs for these runs are in `results/round3/`.
+
+**Reversed batch order** (same gated recipe, e210 → e197):
+
+| | Accepted batches | Gate-set end | Held-out vs start (95% CI) | Full-vocab EOS, no answer |
+|---|---|---|---|---|
+| Forward | e207, e209, e210 (3/14) | 89.2% | +3.7pp (+1.5, +6.1) | 12.4% |
+| Reversed | e207, e205, e203, e200, e199 (5/14) | 89.7% | +5.5pp (+3.2, +8.0) | 0.3% |
+
+- **Only e207 is accepted in both orders.** Its single step from the start is +1.9pp forward and +2.1pp reversed, the only batch that is reliably positive.
+- **The other batches flip sign depending on the state.**
+  - e209 and e210 hurt from the start (−2.5 and −5.4pp) and help only after e207.
+  - e205, e203, e200 and e199 hurt from the start (−2.0, −2.2, −2.5 and −7.0pp) but are positive or near zero after e207.
+- **Both orders end up at about the same place.** So whether a batch counts as "good" depends mostly on the state it lands on, not on the batch itself.
+- **Paying miners for single-step gate wins therefore rewards queue position more than data quality.** A per-miner turn that applies a larger batch as several sub-steps, and is judged only at its end, would give a cleaner signal.
+
