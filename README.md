@@ -13,6 +13,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | `VERIFIER.md`, `code/lenient_grader.py` | The affine_math grader scores 481 correct finished answers as 0 in e196–e260. The script reproduces the live projection + `verify.py` (0 mismatches on 4,073 rollouts) and measures nine deterministic fixes |
 | `code/gated.sh`, `code/summarize.py` | Gated-run driver; results summary |
 | `EXPERIMENT-2x2.md`, `code/run_2x2.sh` | Head × batch 2×2 on 7fa0305a / 6b16e298, plus the extra 6b16e298 arms: one command, pre-registered decision rules |
+| `EXPERIMENT-ff-steps.md`, `code/run_ff_steps.sh`, `code/compare_ff.py` | Large free files: one step vs. a chain of sub-steps, live step vs. our step; reads `affine-batch-v1` files the way v8.3.3h does |
 | `data/heldout.json` | The 750 held-out tasks: `index`, `prompt_ids`, `answer`, `level`, `subject` |
 | `data/gate.json` | The 1,000-task gate set used in the gated runs (same format) |
 | `data/gate_B.json` | The 977 tasks of `gate.json` not used in any batch e196–e245 (live-head runs and the 2×2) |
@@ -46,6 +47,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 
 - **Common setup:** start checkpoint 7fa0305a; K=1 batches e197–e213 applied in order, every step accepted (the gated runs are the exception). The probe text is the e196 batch, which is not used for training.
 - **`--turns`** takes a range (`197-213`), a reversed range (`210-197`) or a comma list (`226-228,232-235`).
+- **`--ff FILE`** trains on a free file instead of `--turns`: `--ff-per-step 0` applies it as one step, `--ff-per-step 9` as a chain of 9-prompt sub-steps (`--ff-seed` fixes the order). `--start-master DIR` starts from a published fp32 master.
 - **Environment:** torch 2.14 / transformers 5.14.1 / fla 0.6.0, with your signed source tree (bundle `a2a03cb3…`) and your `/k1/replay/host/` files. The `fp32_renorm` arms use the host files with `patch/support_renorm.diff` applied.
 
 | Arm | Flags |

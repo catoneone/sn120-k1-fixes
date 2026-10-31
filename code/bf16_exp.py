@@ -39,6 +39,18 @@ SLICES = {P + 'layers.31.mlp.down_proj.weight': None, P + 'layers.31.self_attn.o
           'lm_head.weight[100000:101024]': ('lm_head.weight', 100000, 101024)}
 FNAMES = ('ll_correct', 'll_wrong', 'll_capped', 'logPS', 'logPS_capped', 'eos_think')
 ROWWISE = ('model.language_model.embed_tokens.weight', 'lm_head.weight')
+# free files (affine-batch-v1): same limits and tokenization as ops/free_file/release/ff_format.py (v8.3.3h)
+FF_MAX_OUTPUT, FF_MAX_CONTEXT, FF_EOS, FF_CONTROL = 8192, 12288, 248046, frozenset({248044, 248045, 248046})
+FF_SETTINGS = dict(adam_epsilon=1e-08, beta1=0.9, beta2=0.999, cap_policy='affine-unresolved-zero-reward-active-v1', clip_ratio=0.2,
+                   derail_mask=True, derail_tail=64, derail_threshold=-3.0, derail_window=32, dual_clip=3.0, entropy_coefficient=0.0,
+                   group_size=8, kl_coefficient=0.02, kl_reference_checkpoint='87de8304e9d33dde39b81a41fdbbf306426ea6fd993b7d85332e6a48e8a4bbae',
+                   kl_type='low_var_kl', learning_rate=1e-06, loss_agg_mode='seq-mean-token-sum-norm', loss_scale_factor=8192,
+                   max_gradient_norm=1.0, max_tasks=256, normalize_advantage_std=False, old_actor_logprob_tolerance=1e-05,
+                   overlong_max_tokens=8192, overlong_penalty=0.5, overlong_soft_start=6000, ppo_epochs=1, sampler_correction='none',
+                   sampler_ratio_lower=0.2, sampler_ratio_upper=5.0, temperature=1.0, top_k=20, top_p=0.95, weight_decay=0.01,
+                   weight_decay_policy='mcore-bias-and-1d-excluded-v1')      # /k1/spec/step-recipe.json signed_config_settings
+FF_AGG = dict(mode='seq-mean-token-mean', loss_scale=0.5635)
+FF_SGD = dict(sgd_lr=5e-07, sgd_update_norm_cap=1.0, sgd_tensor_rel_cap=2e-05)
 CH = 1 << 25            # flat chunk size for the per-tensor step math (bounded temporaries on the 1e9-element embeddings)
 PROBE_BUDGET = 16384    # packed tokens per probe bin
 bf16_w32 = lambda n, p, sl: p.detach().view(-1)[sl].float()
@@ -127,12 +139,104 @@ class Env:
         return SimpleNamespace(e=e, turn=turn, tr=tr, cfg=cfg, groups=groups, head=inp['checkpoint'],
                                candidate=turn['candidate']['id'], sgd=tr['optimizer']['sgd'])
 
+    def load_ff(self, path, tok_dir, tag, per_step, seed, max_tasks=125, max_rollouts=1000):
+        """A free file (affine-batch-v1) -> sub-step turns. Tokenization, cap and EOS rule as ops/free_file/release/ff_format.py;
+        groups and rewards as ff_trainer.prepare (v8.3.3h). per_step = 0: the whole file as ONE step (live); per_step = n: the
+        prompts in a seeded order, n per sub-step (a chain)."""
+        import random
+        from dataclasses import dataclass
+        from transformers import AutoTokenizer
+        from subnet.mimo_grpo.data import Trajectory, TaskGroup
+        @dataclass(frozen=True)
+        class RewardedTrajectory(Trajectory):
+            reward: float = 0.0
+        raw = Path(path).read_bytes()
+        doc = json.loads(raw.decode('utf-8'))
+        assert set(doc) == {'version', 'hotkey', 'groups'} and doc['version'] == 'affine-batch-v1', 'not an affine-batch-v1 file'
+        kept, n = [], 0
+        for g in doc['groups']:                                              # cap: whole groups in file order
+            if len(kept) == max_tasks or n + len(g['rollouts']) > max_rollouts:
+                break
+            kept.append(g); n += len(g['rollouts'])
+        tok = AutoTokenizer.from_pretrained(str(tok_dir), local_files_only=True)
+        outs = tok([r['output'] for g in kept for r in g['rollouts']], add_special_tokens=False)['input_ids']
+        groups, k = [], 0
+        for i, g in enumerate(kept):
+            ids = tok.apply_chat_template([{'role': 'user', 'content': g['prompt']}], tokenize=True, add_generation_prompt=True)
+            pt = list(ids['input_ids'] if hasattr(ids, 'keys') else ids)
+            trs = []
+            for j, r in enumerate(g['rollouts']):
+                ot = list(outs[k]); k += 1
+                assert not FF_CONTROL & set(ot) and len(ot) <= FF_MAX_OUTPUT, f'group {i} rollout {j}: invalid output'
+                stop = 'max_tokens' if len(ot) == FF_MAX_OUTPUT else 'eos'
+                if stop == 'eos':
+                    ot.append(FF_EOS)
+                assert len(pt) + len(ot) <= FF_MAX_CONTEXT, f'group {i} rollout {j}: prompt + output too long'
+                w = float(r['reward'])
+                trs.append(RewardedTrajectory(nonce=j, tokens=tuple(ot), stop=stop, reward=w,
+                                              outcome='unresolved' if stop == 'max_tokens' else ('correct' if w > 0 else 'wrong')))
+            ps = hashlib.sha256(g['prompt'].encode()).hexdigest()
+            groups.append(TaskGroup(task_id=hashlib.sha256(f'{tag}|{i}|{ps}'.encode()).hexdigest(), prompt=tuple(pt),
+                                    trajectories=tuple(trs), admission_sha256=ps))
+        self.ff_prompts = [g['prompt'] for g in kept]
+        cfg = self.TrainerConfig(**FF_SETTINGS)
+        if self.no_overlong:
+            cfg = self.TrainerConfig(**dict(FF_SETTINGS, overlong_penalty=0.0))
+        order = list(range(len(groups)))
+        if per_step:
+            random.Random(seed).shuffle(order)
+            parts = [order[i:i + per_step] for i in range(0, len(order), per_step)]
+        else:
+            parts = [order]
+        tr = dict(loss_aggregation=FF_AGG, unresolved_filter={'enabled': False}, microbatch={'world': 8}, trajectories=[])
+        mode = f'c{per_step}s{seed}' if per_step else 'pooled'
+        return [SimpleNamespace(e=f'{tag}_{mode}_{s:02d}', turn=None, tr=tr, cfg=cfg, groups=[groups[i] for i in part], head=tag,
+                                candidate=None, sgd=dict(FF_SGD), ff=True, order=part) for s, part in enumerate(parts, start=1)]
+
+    def layout_ff(self, groups, cfg):
+        """= v8.3.3h v8211_batched._layout: reward = miner reward + the soft overlong penalty term, advantage over the group's
+        own rollouts (one rollout: the reward itself), unresolved rows stay active under the live cap policy."""
+        B, torch = self.B, self.torch
+        import numpy as np
+        rows = []
+        for group in groups:
+            rr = [r.reward + cfg.reward('wrong', len(r.tokens)) for r in group.trajectories]
+            rewards = torch.tensor([[x] for x in rr], dtype=torch.float32)
+            adv, _ = B.reference().compute_grpo_outcome_advantage(rewards, torch.ones_like(rewards),
+                                                                  np.array([group.task_id] * len(rr)), norm_adv_by_std_in_grpo=False)
+            for rollout, a, r in zip(group.trajectories, adv[:, 0], rr, strict=True):
+                active = not (rollout.outcome == 'unresolved' and cfg.cap_policy == B.MASK_UNRESOLVED)
+                rows.append(dict(group=group, rollout=rollout, advantage=float(a), active=active, keep=len(rollout.tokens),
+                                 derail_index=None, reward=r))
+        B._prompt_weights(rows)
+        return rows
+
+    def gate_overlap(self, gate_tasks, prompts, tok_dir):
+        """Gate tasks whose problem text appears in (or contains) a free-file prompt: excluded from the comparison."""
+        from transformers import AutoTokenizer
+        import re
+        tok = AutoTokenizer.from_pretrained(str(tok_dir), local_files_only=True)
+        norm = lambda x: re.sub(r'\s+', ' ', x).strip().lower()
+        fp = [norm(p) for p in prompts]
+        out = set()
+        for t in json.loads(Path(gate_tasks).read_text()):
+            text = tok.decode(t['prompt_ids'])
+            user = norm(text.split('<|im_start|>user\n', 1)[-1].split('<|im_end|>', 1)[0])
+            for f in fp:
+                a, b = (user, f) if len(user) <= len(f) else (f, user)
+                if len(a) >= 40 and a in b:
+                    out.add(t['index']); break
+        return out
+
     def layout(self, T):
         B = self.B
         B.LOSS_AGG_MODE = T.tr['loss_aggregation']['mode']; B.LOSS_SCALE = float(T.tr['loss_aggregation']['loss_scale'])
         B.DROP_UNRESOLVED = bool((T.tr.get('unresolved_filter') or {}).get('enabled'))
         agg, loss_scale, _ = B.loss_aggregation(T.cfg)
-        rows = B.layout_drop_unresolved(T.groups, T.cfg)[0] if B.DROP_UNRESOLVED else B._layout(T.groups, T.cfg)
+        if getattr(T, 'ff', False):
+            rows = self.layout_ff(T.groups, T.cfg)
+        else:
+            rows = B.layout_drop_unresolved(T.groups, T.cfg)[0] if B.DROP_UNRESOLVED else B._layout(T.groups, T.cfg)
         if self.adv_pos:
             for r in rows:
                 r['advantage'] = max(0.0, r['advantage'])
@@ -550,9 +654,13 @@ def gate_run(a, ckpt, out_path, log):
     return rows
 
 
+GATE_EXCLUDE = set()     # gate task indices left out of every comparison (tasks that appear in a free file)
+
+
 def gate_compare(head, cand):
     """Paired per-task difference of mean correctness (common random numbers); official rule: z > 0 and capped < 20%."""
     from collections import defaultdict
+    head = [x for x in head if x['index'] not in GATE_EXCLUDE]; cand = [x for x in cand if x['index'] not in GATE_EXCLUDE]
     acc = defaultdict(lambda: [[], []])
     for k, rows in ((0, head), (1, cand)):
         for x in rows:
@@ -573,7 +681,16 @@ def cmd_stream(a):
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True); log = out / 'log.txt'
     env.adv_pos, env.no_overlong, env.opt, env.clip_k, env.step_mult = a.adv_pos, a.no_overlong, a.opt, a.clip_k, a.step_mult
     say(log, 'ARM', a.arm, 'opt', a.opt, 'step_mult', a.step_mult, 'adv_pos', a.adv_pos, 'no_overlong', a.no_overlong, 'turns', a.turns)
-    Ts = [env.load_turn(a.data, e) for e in parse_turns(a.turns)]
+    if a.ff:
+        Ts = env.load_ff(a.ff, a.ff_tok or a.start, a.ff_tag, a.ff_per_step, a.ff_seed)
+        say(log, 'FF', a.ff, 'tag', a.ff_tag, 'substeps', len(Ts), 'prompts', [len(T.groups) for T in Ts],
+            'rollouts', [sum(len(g.trajectories) for g in T.groups) for T in Ts], 'order', [T.order for T in Ts])
+        if a.gate_tasks:
+            GATE_EXCLUDE.update(env.gate_overlap(a.gate_tasks, env.ff_prompts, a.ff_tok or a.start))
+            (out / 'gate_exclude.json').write_text(json.dumps(sorted(GATE_EXCLUDE)))
+            say(log, 'GATE_EXCLUDE', len(GATE_EXCLUDE), sorted(GATE_EXCLUDE))
+    else:
+        Ts = [env.load_turn(a.data, e) for e in parse_turns(a.turns)]
     env.ensure_refs(Ts, a.refdir, a.ref, log)
     if a.arm == 'fp32_renorm':
         assert hasattr(env.B, 'SUPPORT_RENORM'), 'fp32_renorm needs the patched host'
@@ -584,13 +701,33 @@ def cmd_stream(a):
     params = [(n, p) for n, p in actor.model.named_parameters() if p.requires_grad]
     pd = dict(params)
     master = {n: p.detach().float().cpu().pin_memory() for n, p in params} if use_master else None
+    if use_master and a.start_master:
+        # the head's published fp32 master (v8.3.3f); the bf16 head must be its round-to-nearest-even image
+        from safetensors.torch import load_file
+        got = {}
+        for f in sorted(Path(a.start_master).glob('*.safetensors')):
+            got.update(load_file(str(f)))
+        missing = [n for n in master if n not in got]
+        if missing:
+            raise SystemExit(f'start-master: {len(missing)} trainable tensors missing, e.g. {missing[:3]}')
+        bad = 0
+        for n, p in params:
+            m = got[n].float()
+            assert m.shape == p.shape, n
+            bad += int((m.to(torch.bfloat16) != p.detach().cpu()).sum())
+            master[n].copy_(m)
+        say(log, 'START_MASTER', a.start_master, 'tensors', len(master), 'bf16 mismatches', bad)
+        if bad:
+            raise SystemExit('start-master does not round to the start checkpoint')
     sd_get = lambda n: pd[n].detach()
     start_slices = {k: slice_of(k, sd_get).float().cpu().clone() for k in SLICES}
     import numpy as np
     dirs = dict(np.load(a.dirs)) if Path(a.dirs).exists() else {}     # collapse directions (EXP-022), optional: alignment skipped without them
-    items, cats = build_probe_items(env, a.data, a.probe_turn)
+    items, cats = build_probe_items(env, a.data, a.probe_turn) if a.probe_turn >= 0 else ([], [])
 
     def snapshot(step):
+        if not items:
+            return
         vals = probe_values(env, actor, items, cats, think_end)
         al = {}
         for dn in ('collapse_b1', 'collapse_orig') if dirs else ():
@@ -754,12 +891,28 @@ def cmd_pooled(a):
 
 def cmd_refs(a):
     env = Env(a.source, a.host); model_cfg(env, a.ref)
-    env.ensure_refs([env.load_turn(a.data, e) for e in parse_turns(a.turns)], a.refdir, a.ref, Path(a.refdir) / 'log.txt')
+    Ts = (env.load_ff(a.ff, a.ff_tok, a.ff_tag, a.ff_per_step, a.ff_seed) if a.ff
+          else [env.load_turn(a.data, e) for e in parse_turns(a.turns)])
+    env.ensure_refs(Ts, a.refdir, a.ref, Path(a.refdir) / 'log.txt')
 
 
 def cmd_dry(a):
     """CPU check of the batch path: rebuild each turn, compare the planned rank tokens with the published plan."""
     env = Env(a.source, a.host); think_end = model_cfg(env, a.cfgdir)
+    if a.ff:
+        Ts = env.load_ff(a.ff, a.ff_tok or a.cfgdir, a.ff_tag, a.ff_per_step, a.ff_seed)
+        for T in Ts:
+            L = env.layout(T)
+            adv = [r['advantage'] for r in L.rows]
+            print('DRY_FF', T.e, 'prompts', len(T.groups), 'rollouts', len(L.rows), 'active', len(L.active),
+                  'capped', sum(r['rollout'].stop == 'max_tokens' for r in L.rows), 'tokens', sum(len(r['rollout'].tokens) for r in L.rows),
+                  'adv+', sum(x > 0 for x in adv), 'adv-', sum(x < 0 for x in adv), 'adv0', sum(x == 0 for x in adv),
+                  'bins', sum(len(b) for b in L.assign), 'rank_tokens', [sum(len(L.rows[i]['rollout'].tokens) for b in r for i in b) for r in L.assign][:8],
+                  flush=True)
+        if a.gate_tasks:
+            ex = env.gate_overlap(a.gate_tasks, env.ff_prompts, a.ff_tok or a.cfgdir)
+            print('DRY_FF gate overlap', len(ex), sorted(ex)[:20], flush=True)
+        return
     items, cats = build_probe_items(env, a.data, a.probe_turn)
     c = probe_counts(items, cats, think_end)
     print('PROBE', a.probe_turn, len(items), 'cats', c['cat'], 'tokens', sum(len(o) for _, o in items), 'bins', len(probe_bins(items)),
@@ -776,7 +929,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('cmd', choices=['refs', 'stage1', 'stream', 'dry', 'pooled'])
     ap.add_argument('--source', required=True); ap.add_argument('--host', default=str(HERE / 'replay' / 'host'))
-    ap.add_argument('--data', required=True); ap.add_argument('--refdir', default='/data/refcache')
+    ap.add_argument('--data', default=''); ap.add_argument('--refdir', default='/data/refcache')
     ap.add_argument('--ref'); ap.add_argument('--out')
     ap.add_argument('--turn', type=int); ap.add_argument('--head'); ap.add_argument('--candidate')
     ap.add_argument('--probe-turn', type=int, default=196)
@@ -789,6 +942,9 @@ def main():
     ap.add_argument('--no-overlong', action='store_true')
     ap.add_argument('--gate-tasks'); ap.add_argument('--gate-py', default='/data/venvB/bin/python'); ap.add_argument('--gate-k', type=int, default=4)
     ap.add_argument('--cand-dir'); ap.add_argument('--observe-steps'); ap.add_argument('--mults', default='1,4')
+    ap.add_argument('--ff', help='free file (affine-batch-v1) instead of --turns'); ap.add_argument('--ff-tok', help='tokenizer dir (default --start)')
+    ap.add_argument('--ff-tag', default='ff'); ap.add_argument('--ff-per-step', type=int, default=0, help='0 = whole file as one step')
+    ap.add_argument('--ff-seed', type=int, default=0); ap.add_argument('--start-master', help='dir with the head fp32 master safetensors')
     a = ap.parse_args()
     dict(refs=cmd_refs, stage1=cmd_stage1, stream=cmd_stream, dry=cmd_dry, pooled=cmd_pooled)[a.cmd](a)
 
