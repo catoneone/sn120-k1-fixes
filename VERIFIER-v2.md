@@ -49,9 +49,22 @@ We ran 6,558 finished replies through the probe logic (native grade first, then 
 | wrong → correct | 19 | E9 task 5442 ×5, E8 tasks 3940 ×8 / 4573 / 3830, E3 tasks 3094 ×2 / 3140 ×2. We checked each by hand, and all are correct. |
 | correct → unresolved | 2 | Task 2345: an intermediate `\boxed{18}` in the answer channel before `\boxed{73}`. Task 1548: a degenerate reply with a malformed second box `\boxed{[-3,-frac{4}{3})}`. Both break "exactly one box" with a box that is not the answer. |
 
-## 4. A false positive the lenient layer cannot fix: `verify.py` and clock times
+## 4. A false positive the lenient layer cannot fix: `verify.py` and clock times (fix: `code/clock_precheck.py`)
 
-math-verify 0.9.0 parses `8:34` as a ratio and drops `\text{ p.m.}`. So the native grade already accepts `8:34` and `8:34 a.m.` for the gold `8\!:\!34 \text{ p.m.}`. The lenient layer runs only when the native grade is *not* positive, so it never sees these. Two pool tasks have clock-time golds, 4713 and 5442. The fix has to sit in front of `native()`: for example, if `clock_seconds(gold)` is not None, grade with `clock_seconds` only. The test file reports these two cases under `LIVE_FALSE_POSITIVES`.
+math-verify 0.9.0 parses `8:34` as a ratio and drops `\text{ p.m.}`. So the native grade accepts `8:34` and `8:34 a.m.` for the gold `8\!:\!34 \text{ p.m.}`. The lenient layer runs only when the native grade is *not* positive, so it never sees these. Only two pool tasks have clock-time golds, 4713 and 5442.
+
+This happens in real data:
+- **e413 (GREEN):** the group for task 5442 has `\boxed{8:34 \text{ AM}}` labelled **+1** and four `\boxed{20:34}` labelled **0**. 1,234 minutes after midnight is 20:34, so that group trains the head toward the wrong answer.
+- **e215 (K=1):** two `8:34 AM` replies were graded positive, and `20:34` was graded negative.
+
+**Fix, run in front of `native()`:** `clock_verdict(gold, box, prompt)` in `code/clock_precheck.py` (only uses `re`).
+- It returns `None` when the gold is not a clock time, so every other task is untouched.
+- Otherwise it compares times. A reply time is unambiguous if it has a.m./p.m. or its hour is 0 or ≥ 13. A bare 1–12 o'clock time counts only when the prompt asks for no am/pm. Task 4713 says *"Enter the time in the format "HH:MM:SS", without including "am" or "pm""*, even though its gold is written `4:51:06 p.m.`. In that case the reply is compared on a 12-hour clock.
+- The docstring shows where it plugs into `grade()`: on the projected box before `native()`, and on the lenient box before `lenient_equal`.
+
+**Tests:** `code/test_clock_precheck.py` has 27 unit cases, and `--tasks/--docs/--ff` replays every real reply to the two tasks. On the 17 real finished replies, exactly three grades change: `8:34 AM` goes correct → wrong in e413 ×1 and e215 ×2. Two behaviour changes are intended:
+- On 5442, a bare `8:34` or `08:34` (no a.m./p.m.) becomes wrong.
+- On 4713, `4:51:06` without am/pm stays correct, as its prompt asks.
 
 ## 5. Miner labels disagree with the gate
 
