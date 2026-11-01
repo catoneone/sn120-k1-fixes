@@ -1,6 +1,6 @@
 # SN120 K=1 training: sampler mismatch, bf16 rounding, sign step
 
-This bundle contains the findings, the arm code (EXP-022/023), the 750-task held-out set and the exact sampling settings. Start with `FINDINGS.md`. The grader issue (correct answers scored 0) is in `VERIFIER.md`.
+This bundle contains the findings, the arm code (EXP-022/023), the 750-task held-out set and the exact sampling settings. Start with `FINDINGS.md`. The grader issue (correct answers scored 0) is in `VERIFIER.md`; the follow-up to the deployed fix is in `VERIFIER-v2.md`.
 
 | Path | What it is |
 |---|---|
@@ -11,6 +11,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | `code/gate_eval.py` | Official-style gate eval used in the gated runs (1,000 tasks × 4) |
 | `code/fetch_k1.py` | Downloads `/k1/turns/<e>/turn.json` and the batch documents (by sha256); epochs without a turn are skipped |
 | `VERIFIER.md`, `code/lenient_grader.py` | The affine_math grader scores 481 correct finished answers as 0 in e196–e260. The script reproduces the live projection + `verify.py` (0 mismatches on 4,073 rollouts) and measures nine deterministic fixes |
+| `VERIFIER-v2.md`, `code/lenient_grader_v2.py`, `code/test_lenient_grader.py`, `code/regress_v2.py` | Follow-up to the live fix (`allan-lenient-v1-786cdb9`): 50 unit cases incl. deliberately wrong answers (v1 accepts 5 of them and misses 7 correct ones), a drop-in v2 for `allan_src.py`, regression on 6,558 real replies (+19 correct, −2), a `verify.py` clock-time false positive, and miner labels that disagree with the gate |
 | `code/gated.sh`, `code/summarize.py` | Gated-run driver; results summary |
 | `EXPERIMENT-2x2.md`, `code/run_2x2.sh` | Head × batch 2×2 on 7fa0305a / 6b16e298, plus the extra 6b16e298 arms: one command, pre-registered decision rules |
 | `EXPERIMENT-ff-steps.md`, `code/run_ff_steps.sh`, `code/compare_ff.py` | Large free files: one step vs. a chain of sub-steps, live step vs. our step; reads `affine-batch-v1` files the way v8.3.3h does |
