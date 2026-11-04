@@ -20,6 +20,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | `data/gate.json` | The 1,000-task gate set used in the gated runs (same format) |
 | `data/gate_B.json` | The 977 tasks of `gate.json` not used in any batch e196–e245 (live-head runs and the 2×2) |
 | `results/verifier/regression.json` | Grader regression: label matrices before and after the fixes, counts per fix, every changed (task, fix) with the answers |
+| `exp024/` | Gate variance and local reproduction of the gate on e600 / head 2cf21ce5: per-task grades of 13 eval runs, local train reports, per-tensor weight diff vs the gate candidate, scripts. Start with `exp024/README.md` |
 | `results/` | Per-arm step logs (`steps.jsonl`), fixed-text probes (`snapshots.jsonl`), single-step results (`stage1/`), and per-sample generation results (`gen_*/trunc.jsonl`, `full.jsonl`, `summary.json`) |
 
 ## Held-out set
