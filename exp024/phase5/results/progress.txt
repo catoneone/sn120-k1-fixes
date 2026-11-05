@@ -1,0 +1,144 @@
+2026-11-05T03:11:28Z START
+2026-11-05T03:11:41Z SOURCE 9935e14abaf491d4a810670e87adebf5ab20db68
+downloaddownload  downloaddownload  fp32-master-00003-of-00009.safetensorsfp32-master-00004-of-00009.safetensors  4.27 GB4.13 GB
+
+fp32-master-00001-of-00009.safetensors 4.27 GB
+fp32-master-00002-of-00009.safetensors 4.20 GB
+downloaddownloaddownload  fp32-master-00001-of-00009.safetensors fp32-master-00003-of-00009.safetensorsdownloadfp32-master-00002-of-00009.safetensors  4.27 GB 
+fp32-master-00004-of-00009.safetensors4.27 GB  
+4.13 GB4.20 GB
+
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+download fp32-master-00005-of-00009.safetensors 4.10 GB
+download fp32-master-00006-of-00009.safetensors 4.13 GB
+download fp32-master-00007-of-00009.safetensors 4.27 GB
+download fp32-master-00008-of-00009.safetensors 2.38 GB
+download fp32-master-00005-of-00009.safetensors 4.10 GB
+CKPT_OK 58bcc262
+download fp32-master-00009-of-00009.safetensors 4.07 GB
+download fp32-master-00006-of-00009.safetensors 4.13 GB
+download fp32-master-00007-of-00009.safetensors 4.27 GB
+{"ok": true, "role": "reference", "checkpoint": "87de8304e9d33dde39b81a41fdbbf306426ea6fd993b7d85332e6a48e8a4bbae", "epoch": "affine-mimo9b-grpo-20261013-e000729", "dir": "/data/models/ref"}
+download fp32-master-00008-of-00009.safetensors 2.38 GB
+download fp32-master-00009-of-00009.safetensors 4.07 GB
+{"ok": true, "checkpoint": "58bcc26246bcb390ea700ad32a66886270186384cf287c2a5048f6b98c4b1cbb", "epoch": 708, "files": 9, "bytes": 35815268944, "master_digest": "9beeffc6f291af924ac3bd7775bc5071ad2c508cb255d7119f73dde66b9d67ce", "dir": "/data/models/58bcc262-fp32-master", "file_sha256": "ok", "master_digest_check": "ok"}
+{"ok": true, "checkpoint": "1b70bca870a3c084bc6577b3e2cadafec42bd95617fbde62f1026b71e52ed0c1", "epoch": 718, "files": 9, "bytes": 35815268944, "master_digest": "3710cbd38b50453d5e99264f90ba379fb65567ddbb0f9cd2b0a3ff4e5c937e19", "dir": "/data/models/gate-master", "file_sha256": "ok", "master_digest_check": "ok"}
+2026-11-05T03:17:23Z SETUP_OK
+{"status": "updated", "loss": 0.0002462482046610148, "preclip_gradient_norm": 1.9330708980560303, "raw_update_norm": 0.022734155667154966, "update_norm_master": 0.045468311289986636, "tensors_rel_capped": 242, "lr": 5e-07, "kl": 0.005, "step_mult": 2, "knobs": {}, "out": "/dev/shm/p5/L"}
+2026-11-05T03:33:47Z TRAIN_OK L
+{"status": "updated", "loss": 0.0002453092457130879, "preclip_gradient_norm": 2.1519827842712402, "raw_update_norm": 0.022729158417645248, "update_norm_master": 0.045458316681045455, "tensors_rel_capped": 242, "lr": 5e-07, "kl": 0.005, "step_mult": 2, "knobs": {}, "out": "/dev/shm/p5/K"}
+2026-11-05T03:35:41Z TRAIN_OK K
+2026-11-05T03:38:18Z PROBE_OK kit
+2026-11-05T03:40:26Z PROBE_OK fp32ref
+2026-11-05T03:41:11Z PROBE_OK live
+2026-11-05T03:43:22Z PROBE_OK live_fusednorm
+tensors 427 427 427 common 427
+{"elements": 8953803264, "a_ne_b": 6740407175, "max_abs": 0.00028239376842975616, "dot": 0.0020548899164218835, "na": 0.045255493496324024, "nb": 0.04525626607479683, "nab": 0.004970519784434834, "a_eq_h": 0, "b_eq_h": 0, "cos": 1.0033178453883291, "rel_diff": 0.10983240708309977}
+tensors 427 427 427 common 427
+{"elements": 8953803264, "a_ne_b": 6971534318, "max_abs": 0.0016939141787588596, "dot": 0.0018422639038059643, "na": 0.045255493496324024, "nb": 0.04524769553362342, "nab": 0.021116399256384928, "a_eq_h": 0, "b_eq_h": 0, "cos": 0.8996717264170838, "rel_diff": 0.4666041097994027}
+tensors 427 427 427 common 427
+{"elements": 8953803264, "a_ne_b": 6971551893, "max_abs": 0.001696075196377933, "dot": 0.0018479873310828527, "na": 0.04525626607479683, "nb": 0.04524769553362342, "nab": 0.02084663331330146, "a_eq_h": 0, "b_eq_h": 0, "cos": 0.9024513626193184, "rel_diff": 0.4606352914499707}
+kit:fp32ref {"cos": 0.5750457794539476, "ratio": 1.3558449543307427}
+    00-07|all {'cos': 0.3075, 'ratio': 1.6814}
+    00-07|gdn_gate {'cos': 0.1135, 'ratio': 1.9748}
+    08-15|all {'cos': 0.9675, 'ratio': 1.0235}
+    08-15|gdn_gate {'cos': 0.7725, 'ratio': 1.1615}
+    16-23|all {'cos': 0.9883, 'ratio': 1.0074}
+    16-23|gdn_gate {'cos': 0.9885, 'ratio': 0.9869}
+    24-31|all {'cos': 0.9888, 'ratio': 1.0106}
+    24-31|gdn_gate {'cos': 0.9732, 'ratio': 1.0308}
+    top|all {'cos': 0.3392, 'ratio': 1.6504}
+live:fp32ref {"cos": 0.943245476890224, "ratio": 0.9782812475018209}
+    00-07|all {'cos': 0.8854, 'ratio': 0.9482}
+    00-07|gdn_gate {'cos': 0.7726, 'ratio': 0.8176}
+    08-15|all {'cos': 0.9869, 'ratio': 1.0036}
+    08-15|gdn_gate {'cos': 0.9824, 'ratio': 1.0254}
+    16-23|all {'cos': 0.9924, 'ratio': 1.0}
+    16-23|gdn_gate {'cos': 0.992, 'ratio': 0.9936}
+    24-31|all {'cos': 0.9947, 'ratio': 0.9893}
+    24-31|gdn_gate {'cos': 0.9963, 'ratio': 0.9722}
+    top|all {'cos': 0.8672, 'ratio': 0.9406}
+kit:live {"cos": 0.7004167307657474, "ratio": 1.3859459718696274}
+    00-07|all {'cos': 0.5355, 'ratio': 1.7732}
+    00-07|gdn_gate {'cos': 0.481, 'ratio': 2.4153}
+    08-15|all {'cos': 0.9631, 'ratio': 1.0199}
+    08-15|gdn_gate {'cos': 0.8059, 'ratio': 1.1328}
+    16-23|all {'cos': 0.9835, 'ratio': 1.0074}
+    16-23|gdn_gate {'cos': 0.9826, 'ratio': 0.9932}
+    24-31|all {'cos': 0.985, 'ratio': 1.0215}
+    24-31|gdn_gate {'cos': 0.9699, 'ratio': 1.0602}
+    top|all {'cos': 0.572, 'ratio': 1.7547}
+live_fusednorm:fp32ref {"cos": 0.9455996141454341, "ratio": 1.0084179711975643}
+    00-07|all {'cos': 0.8901, 'ratio': 1.0044}
+    00-07|gdn_gate {'cos': 0.8717, 'ratio': 0.9975}
+    08-15|all {'cos': 0.989, 'ratio': 1.0134}
+    08-15|gdn_gate {'cos': 0.984, 'ratio': 1.0087}
+    16-23|all {'cos': 0.9926, 'ratio': 1.0062}
+    16-23|gdn_gate {'cos': 0.994, 'ratio': 0.9971}
+    24-31|all {'cos': 0.994, 'ratio': 1.0144}
+    24-31|gdn_gate {'cos': 0.9957, 'ratio': 1.0786}
+    top|all {'cos': 0.9018, 'ratio': 1.0032}
+live_fusednorm:live {"cos": 0.9530358643669333, "ratio": 1.0308057869582001}
+    00-07|all {'cos': 0.9136, 'ratio': 1.0592}
+    00-07|gdn_gate {'cos': 0.8442, 'ratio': 1.22}
+    08-15|all {'cos': 0.9818, 'ratio': 1.0098}
+    08-15|gdn_gate {'cos': 0.979, 'ratio': 0.9837}
+    16-23|all {'cos': 0.9873, 'ratio': 1.0062}
+    16-23|gdn_gate {'cos': 0.9886, 'ratio': 1.0036}
+    24-31|all {'cos': 0.9891, 'ratio': 1.0254}
+    24-31|gdn_gate {'cos': 0.9906, 'ratio': 1.1094}
+    top|all {'cos': 0.9195, 'ratio': 1.0666}
+kit:live_fusednorm {"cos": 0.7183726467956699, "ratio": 1.3445267667340217}
+    00-07|all {'cos': 0.5682, 'ratio': 1.6741}
+    00-07|gdn_gate {'cos': 0.3977, 'ratio': 1.9798}
+    08-15|all {'cos': 0.9654, 'ratio': 1.01}
+    08-15|gdn_gate {'cos': 0.8168, 'ratio': 1.1515}
+    16-23|all {'cos': 0.984, 'ratio': 1.0012}
+    16-23|gdn_gate {'cos': 0.9863, 'ratio': 0.9897}
+    24-31|all {'cos': 0.986, 'ratio': 0.9963}
+    24-31|gdn_gate {'cos': 0.9722, 'ratio': 0.9557}
+    top|all {'cos': 0.5735, 'ratio': 1.6452}
+2026-11-05T03:50:51Z ALL_DONE
+2026-11-05T04:00:20Z PROBE_OK live_gdn_only
+2026-11-05T04:00:31Z PROBE_OK kit_flaconv
+live_gdn_only:fp32ref {"cos": 0.9266730689411149, "ratio": 1.001311659635184}
+    00-07|all {'cos': 0.8494, 'ratio': 1.0002}
+    00-07|gdn_gate {'cos': 0.7856, 'ratio': 1.0288}
+    08-15|all {'cos': 0.9867, 'ratio': 1.0042}
+    08-15|gdn_gate {'cos': 0.9761, 'ratio': 1.0447}
+    16-23|all {'cos': 0.9932, 'ratio': 1.0004}
+    16-23|gdn_gate {'cos': 0.9939, 'ratio': 0.9962}
+    24-31|all {'cos': 0.994, 'ratio': 0.9908}
+    24-31|gdn_gate {'cos': 0.9972, 'ratio': 0.9974}
+    top|all {'cos': 0.8806, 'ratio': 0.9717}
+kit_flaconv:fp32ref {"cos": 0.9538920213123189, "ratio": 1.0176358480004697}
+    00-07|all {'cos': 0.9112, 'ratio': 1.0262}
+    00-07|gdn_gate {'cos': 0.8622, 'ratio': 0.9563}
+    08-15|all {'cos': 0.9874, 'ratio': 1.0117}
+    08-15|gdn_gate {'cos': 0.9787, 'ratio': 1.0154}
+    16-23|all {'cos': 0.992, 'ratio': 1.0059}
+    16-23|gdn_gate {'cos': 0.9935, 'ratio': 0.9987}
+    24-31|all {'cos': 0.9932, 'ratio': 1.0181}
+    24-31|gdn_gate {'cos': 0.9941, 'ratio': 1.1031}
+    top|all {'cos': 0.9291, 'ratio': 1.0311}
+live_gdn_only:live {"cos": 0.9569117051295597, "ratio": 1.0235417086775143}
+    00-07|all {'cos': 0.9144, 'ratio': 1.0548}
+    00-07|gdn_gate {'cos': 0.8672, 'ratio': 1.2584}
+    08-15|all {'cos': 0.9889, 'ratio': 1.0006}
+    08-15|gdn_gate {'cos': 0.9756, 'ratio': 1.0189}
+    16-23|all {'cos': 0.9928, 'ratio': 1.0004}
+    16-23|gdn_gate {'cos': 0.9926, 'ratio': 1.0026}
+    24-31|all {'cos': 0.9946, 'ratio': 1.0014}
+    24-31|gdn_gate {'cos': 0.9972, 'ratio': 1.0259}
+    top|all {'cos': 0.9083, 'ratio': 1.0331}
+kit_flaconv:live {"cos": 0.9428684508611505, "ratio": 1.0402283091893525}
+    00-07|all {'cos': 0.8946, 'ratio': 1.0823}
+    00-07|gdn_gate {'cos': 0.7654, 'ratio': 1.1696}
+    08-15|all {'cos': 0.9793, 'ratio': 1.008}
+    08-15|gdn_gate {'cos': 0.9724, 'ratio': 0.9902}
+    16-23|all {'cos': 0.9867, 'ratio': 1.0059}
+    16-23|gdn_gate {'cos': 0.987, 'ratio': 1.0051}
+    24-31|all {'cos': 0.9881, 'ratio': 1.0291}
+    24-31|gdn_gate {'cos': 0.9886, 'ratio': 1.1346}
+    top|all {'cos': 0.8991, 'ratio': 1.0963}
+2026-11-05T04:02:27Z ABL_DONE
