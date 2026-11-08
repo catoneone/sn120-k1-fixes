@@ -1,0 +1,146 @@
+[
+ {
+  "task": "math:6881",
+  "epoch": "381",
+  "gold": "\\begin{pmatrix} -11/15 \\\\ -2/3 \\\\ -2/15 \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "}{15} = \\frac{3}{15} = \\frac{1}{5} = \\mathbf{u}\\cdot\\mathbf{b},\n\\]\nso $\\mathbf{v}$ and $\\mathbf{a}$ make equal angles with $\\mathbf{b}$, confirming $\\mathbf{b}$ bisects the angle between them.\n\n\\[\n\\boxed{\\begin{pmatrix} -\\dfrac{11}{15} \\\\[4pt] -\\dfrac{10}{15} \\\\[4pt] -\\dfrac{2}{15} \\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7362",
+  "epoch": "398",
+  "gold": "\\begin{pmatrix} 8/3 \\\\ 4/3 \\\\ -4/3 \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "\nVerification: $\\mathbf{v} - \\text{proj} = \\begin{pmatrix} 1/3 \\\\ -4/3 \\\\ -2/3 \\end{pmatrix}$, and its dot product with $\\mathbf{d}$ is $\\frac{2}{3} - \\frac{4}{3} + \\frac{2}{3} = 0$, confirming orthogonality.\n\n\\boxed{\\begin{pmatrix} \\frac{8}{3} \\\\[4pt] \\frac{4}{3} \\\\[4pt] -\\frac{4}{3} \\end{pmatrix}}"
+ },
+ {
+  "task": "math:7454",
+  "epoch": "398",
+  "gold": "\\begin{pmatrix} \\frac{5}{6} & \\frac{1}{3} & -\\frac{1}{6} \\\\ \\frac{1}{3} & \\frac{1}{3} & \\frac{1}{3} \\\\ -\\frac{1}{6} & \\frac{1}{3} & \\frac{5}{6} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "frac{25}{36} + \\frac{1}{9} + \\frac{1}{36} = \\frac{30}{36} = \\frac{5}{6}$, matching the $(1,1)$ entry of $\\mathbf{P}$.\n\n$$\n\\boxed{\\begin{pmatrix} \\frac{5}{6} & \\frac{1}{3} & -\\frac{1}{6} \\\\[5pt] \\frac{1}{3} & \\frac{1}{3} & \\frac{1}{3} \\\\[5pt] -\\frac{1}{6} & \\frac{1}{3} & \\frac{5}{6} \\end{pmatrix}}\n$$"
+ },
+ {
+  "task": "math:7454",
+  "epoch": "398",
+  "gold": "\\begin{pmatrix} \\frac{5}{6} & \\frac{1}{3} & -\\frac{1}{6} \\\\ \\frac{1}{3} & \\frac{1}{3} & \\frac{1}{3} \\\\ -\\frac{1}{6} & \\frac{1}{3} & \\frac{5}{6} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": " and for $\\mathbf{v} = (2,1,0)$ with $\\mathbf{v} \\cdot \\mathbf{n} = 0$, $\\mathbf{P}\\mathbf{v} = (2,1,0)$ as required.\n\n\\[\n\\boxed{\\begin{pmatrix} \\frac{5}{6} & \\frac{1}{3} & -\\frac{1}{6} \\\\[4pt] \\frac{1}{3} & \\frac{1}{3} & \\frac{1}{3} \\\\[4pt] -\\frac{1}{6} & \\frac{1}{3} & \\frac{5}{6} \\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:6881",
+  "epoch": "401",
+  "gold": "\\begin{pmatrix} -11/15 \\\\ -2/3 \\\\ -2/15 \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "\\cdot\\mathbf{b} = \\frac{1}{15}(-11-10+2) = \\frac{3}{15} = \\frac{1}{5}$, so $\\cos\\angle(\\mathbf{v},\\mathbf{b}) = \\frac{1/5}{\\sqrt{3}} = \\frac{1}{5\\sqrt{3}} = \\cos\\angle(\\mathbf{a},\\mathbf{b})$. ✓\n\n\\[\n\\boxed{\\begin{pmatrix} -\\dfrac{11}{15} \\\\[6pt] -\\dfrac{2}{3} \\\\[6pt] -\\dfrac{2}{15} \\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7110",
+  "epoch": "401",
+  "gold": "\\begin{pmatrix} 1/4 \\\\ -7/4 \\\\ 1/2 \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "qrt6/4)(3)} = \\frac{1}{\\sqrt6}$.\nThe angles are equal, confirming $\\mathbf{b}$ bisects the angle.\n\nThus\n\\[\n\\mathbf{b} = \\begin{pmatrix} \\frac{1}{4} \\\\[4pt] -\\frac{7}{4} \\\\[4pt] \\frac{1}{2} \\end{pmatrix}.\n\\]\n\n$\\boxed{\\begin{pmatrix} \\frac{1}{4} \\\\[4pt] -\\frac{7}{4} \\\\[4pt] \\frac{1}{2} \\end{pmatrix}}$"
+ },
+ {
+  "task": "math:6800",
+  "epoch": "401",
+  "gold": "\\begin{pmatrix} 2 \\sqrt{2} \\\\ -\\frac{1}{\\sqrt{2}} \\\\ -\\frac{1}{\\sqrt{2}} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "]\nCheck: $|v'| = \\frac{\\sqrt{16+1+1}}{\\sqrt2} = 3$, $v'\\cdot v = 4-2-2 = 0$, so it is a genuine $90^\\circ$ rotation, and $p=(3,0,0)$ lies on the swept arc at $70.53^\\circ < 90^\\circ$.\n\n\\[\n\\boxed{\\begin{pmatrix} \\dfrac{4}{\\sqrt2} \\\\[4pt] -\\dfrac{1}{\\sqrt2} \\\\[4pt] -\\dfrac{1}{\\sqrt2} \\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "413",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "2}{3}\\begin{pmatrix}1&1&-1\\\\1&1&-1\\\\-1&-1&1\\end{pmatrix} = \\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}.$$\n\n$\\boxed{\\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}}$"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "413",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "{pmatrix}$, which is indeed the reflection of $\\mathbf{v}$ (its component along $\\mathbf{n}$ is $\\frac{1}{3}\\mathbf{n}$, doubled away).\n\n\\[\n\\boxed{\\begin{pmatrix}\\frac{1}{3}&-\\frac{2}{3}&\\frac{2}{3}\\\\[4pt]-\\frac{2}{3}&\\frac{1}{3}&\\frac{2}{3}\\\\[4pt]\\frac{2}{3}&\\frac{2}{3}&\\frac{1}{3}\\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "448",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "2}{3}\\begin{pmatrix}1&1&-1\\\\1&1&-1\\\\-1&-1&1\\end{pmatrix} = \\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}.$$\n\n$\\boxed{\\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}}$"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "448",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "{pmatrix}$, which is indeed the reflection of $\\mathbf{v}$ (its component along $\\mathbf{n}$ is $\\frac{1}{3}\\mathbf{n}$, doubled away).\n\n\\[\n\\boxed{\\begin{pmatrix}\\frac{1}{3}&-\\frac{2}{3}&\\frac{2}{3}\\\\[4pt]-\\frac{2}{3}&\\frac{1}{3}&\\frac{2}{3}\\\\[4pt]\\frac{2}{3}&\\frac{2}{3}&\\frac{1}{3}\\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7362",
+  "epoch": "458",
+  "gold": "\\begin{pmatrix} 8/3 \\\\ 4/3 \\\\ -4/3 \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": " \\frac{8}{6}\\begin{pmatrix} 2 \\\\ 1 \\\\ -1 \\end{pmatrix} = \\frac{4}{3}\\begin{pmatrix} 2 \\\\ 1 \\\\ -1 \\end{pmatrix} = \\begin{pmatrix} \\frac{8}{3} \\\\[4pt] \\frac{4}{3} \\\\[4pt] -\\frac{4}{3} \\end{pmatrix}.\n\\]\n\n\\[\n\\boxed{\\begin{pmatrix} \\dfrac{8}{3} \\\\[4pt] \\dfrac{4}{3} \\\\[4pt] -\\dfrac{4}{3} \\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "481",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "2}{3}\\begin{pmatrix}1&1&-1\\\\1&1&-1\\\\-1&-1&1\\end{pmatrix} = \\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}.$$\n\n$\\boxed{\\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}}$"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "481",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "{pmatrix}$, which is indeed the reflection of $\\mathbf{v}$ (its component along $\\mathbf{n}$ is $\\frac{1}{3}\\mathbf{n}$, doubled away).\n\n\\[\n\\boxed{\\begin{pmatrix}\\frac{1}{3}&-\\frac{2}{3}&\\frac{2}{3}\\\\[4pt]-\\frac{2}{3}&\\frac{1}{3}&\\frac{2}{3}\\\\[4pt]\\frac{2}{3}&\\frac{2}{3}&\\frac{1}{3}\\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "491",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "2}{3}\\begin{pmatrix}1&1&-1\\\\1&1&-1\\\\-1&-1&1\\end{pmatrix} = \\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}.$$\n\n$\\boxed{\\begin{pmatrix}\\frac13&-\\frac23&\\frac23\\\\[2pt]-\\frac23&\\frac13&\\frac23\\\\[2pt]\\frac23&\\frac23&\\frac13\\end{pmatrix}}$"
+ },
+ {
+  "task": "math:7149",
+  "epoch": "491",
+  "gold": "\\begin{pmatrix} \\frac{1}{3} & -\\frac{2}{3} & \\frac{2}{3} \\\\ -\\frac{2}{3} & \\frac{1}{3} & \\frac{2}{3} \\\\ \\frac{2}{3} & \\frac{2}{3} & \\frac{1}{3} \\end{pmatrix}",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "{pmatrix}$, which is indeed the reflection of $\\mathbf{v}$ (its component along $\\mathbf{n}$ is $\\frac{1}{3}\\mathbf{n}$, doubled away).\n\n\\[\n\\boxed{\\begin{pmatrix}\\frac{1}{3}&-\\frac{2}{3}&\\frac{2}{3}\\\\[4pt]-\\frac{2}{3}&\\frac{1}{3}&\\frac{2}{3}\\\\[4pt]\\frac{2}{3}&\\frac{2}{3}&\\frac{1}{3}\\end{pmatrix}}\n\\]"
+ },
+ {
+  "task": "dapo:12701",
+  "epoch": "813",
+  "gold": "x_{1}=1,x_{2}=-6",
+  "v2": "negative",
+  "v3": "E11",
+  "final_tail": "\\(\\sqrt[3]{(7+1)^2}=\\sqrt[3]{64}=4\\), \\(\\sqrt[3]{(7+1)(2-1)}=\\sqrt[3]{8}=2\\).  \n\\(1 + 4 - 2 = 3\\). ✓\n\nFor \\(x=-6\\):  \n\\(\\sqrt[3]{(2+6)^2}=\\sqrt[3]{64}=4\\), \\(\\sqrt[3]{(7-6)^2}=1\\), \\(\\sqrt[3]{(7-6)(2+6)}=\\sqrt[3]{8}=2\\).  \n\\(4 + 1 - 2 = 3\\). ✓\n\nBoth solutions are valid.\n\n\\boxed{x=-6 \\text{ or } x=1}"
+ },
+ {
+  "task": "dapo:12899",
+  "epoch": "843",
+  "gold": "[-1;4]",
+  "v2": "negative",
+  "v3": "E10",
+  "final_tail": "pper values, detailed case checks (at $a=1$ and $a=-1$ and between) confirm $M(a) \\ge F(a)$ holds. Specifically at $b=4, a=-1$, $M=F=15$; at $b=-1, a=1$, $M=F=4$.\n\nValues $b < -1$ fail at $a=1$, and values $b > 4$ fail at $a=-1$.\n\nTherefore, the set of values for $b$ is $[-1, 4]$.\n\n$\\boxed{[-1, 4]}$"
+ }
+]
