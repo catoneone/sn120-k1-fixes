@@ -16,6 +16,7 @@ This bundle contains the findings, the arm code (EXP-022/023), the 750-task held
 | `code/gated.sh`, `code/summarize.py` | Gated-run driver; results summary |
 | `EXPERIMENT-2x2.md`, `code/run_2x2.sh` | Head × batch 2×2 on 7fa0305a / 6b16e298, plus the extra 6b16e298 arms: one command, pre-registered decision rules |
 | `EXPERIMENT-ff-steps.md`, `code/run_ff_steps.sh`, `code/compare_ff.py` | Large free files: one step vs. a chain of sub-steps, live step vs. our step; reads `affine-batch-v1` files the way v8.3.3h does |
+| `EXPERIMENT-bigfile.md`, `code/merge_delta.py`, `code/test_merge_delta.py` | One large file (about 8,000 rollouts from the head): today's one step vs. the 8 files merged into one step vs. a chain of 8 small steps, scored by the live gate; also measures how much independent files agree on the direction |
 | `data/heldout.json` | The 750 held-out tasks: `index`, `prompt_ids`, `answer`, `level`, `subject` |
 | `data/gate.json` | The 1,000-task gate set used in the gated runs (same format) |
 | `data/gate_B.json` | The 977 tasks of `gate.json` not used in any batch e196–e245 (live-head runs and the 2×2) |
