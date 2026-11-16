@@ -1,0 +1,218 @@
+--- a/v2/sn120_v2/params.py
++++ b/v2/sn120_v2/params.py
+@@ -37,6 +37,8 @@
+ 
+ 
+ ATTENTION_AND_MLP_PROJECTIONS = ("q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj")
++# The projections of the 24 linear-attention (Gated DeltaNet) layers. A miner may add them; the default recipe leaves them out.
++LINEAR_ATTENTION_PROJECTIONS = ("in_proj_qkv", "in_proj_z", "out_proj")
+ 
+ 
+ @dataclass(frozen=True)
+@@ -71,17 +73,19 @@
+         return value if self.integer else float(value)
+ 
+ 
+-# The five things a miner may set: learning rate; steps; GRPO group size and
+-# sampling temperature; LoRA rank and alpha; target modules.
++# The things a miner may set: learning rate; steps; mini-batches per step; the cap on the
++# norm of the update; GRPO group size and sampling temperature; LoRA rank and alpha; target modules.
+ # PLACEHOLDER marks a bound the spec does not give. It is not a decision.
+ DEFAULT_MINER_BOUNDS = (
+     MinerBound("lora_lr", 1e-6, 1e-4),  # PLACEHOLDER
+     MinerBound("steps", 1, 4, integer=True),  # PLACEHOLDER
++    MinerBound("minibatches", 1, 8000, integer=True),  # Adam updates per pass over the file; up to one per rollout (= max_rollouts)
++    MinerBound("global_norm_cap", 0.01, 6.0),  # PLACEHOLDER: the miner's own cap on the norm of the update
+     MinerBound("group_size", 2, 64, integer=True),  # PLACEHOLDER
+     MinerBound("sample_temperature", 0.5, 1.5),  # PLACEHOLDER
+     MinerBound("rank", 8, 64, integer=True, decided=True),  # spec: "suggested 8-64"
+     MinerBound("alpha", 8.0, 128.0),  # PLACEHOLDER
+-    MinerBound("target_modules", choices=ATTENTION_AND_MLP_PROJECTIONS, decided=True),  # spec: these 7 projections
++    MinerBound("target_modules", choices=ATTENTION_AND_MLP_PROJECTIONS + LINEAR_ATTENTION_PROJECTIONS, decided=True),  # the 7 projections, plus 3 of linear attention
+ )
+ 
+ 
+@@ -98,7 +102,8 @@
+     steps: int = 1
+     lora_lr: float = 1e-5
+     max_grad_norm: float = 1.0
+-    global_norm_cap: float | None = None  # optional cap on the norm of the whole adapter update
++    minibatches: int = 1  # each step cuts the rows into this many mini-batches, one Adam update each
++    global_norm_cap: float | None = 6.0  # cap on the norm of the whole adapter update; 6 is about the largest step of v2 before mini-batches
+     group_size: int = 0  # PLACEHOLDER: rollouts per GRPO group; 0 = use each prompt's rollouts as the file groups them
+     sample_temperature: float = 1.0  # temperature the batch's rollouts were sampled at
+     rank: int = 16
+@@ -121,6 +126,8 @@
+ 
+     def __post_init__(self) -> None:
+         _need(self.steps >= 1, "recipe.steps must be at least 1")
++        _need(self.minibatches >= 1, "recipe.minibatches must be at least 1")
++        _need(self.global_norm_cap is None or (math.isfinite(self.global_norm_cap) and self.global_norm_cap > 0), "recipe.global_norm_cap must be positive")
+         _need(self.rank >= 1, "recipe.rank must be at least 1")
+         _need(math.isfinite(self.lora_lr) and self.lora_lr > 0, "recipe.lora_lr must be a positive number")
+         _need(math.isfinite(self.max_grad_norm) and self.max_grad_norm > 0, "recipe.max_grad_norm must be positive")
+@@ -199,9 +206,9 @@
+     fold_every_k: int = 1  # fold stacked LoRAs into a new base after this many applies; 1 = every green
+ 
+     # Admission. The batch checker and the miner contract read these same values.
+-    max_batch_bytes: int = 64 * 1024 * 1024
+-    max_prompts: int = 250
+-    max_rollouts: int = 2000
++    max_batch_bytes: int = 128 * 1024 * 1024
++    max_prompts: int = 2000
++    max_rollouts: int = 8000
+     min_reasoning_tokens: int = 32
+     reasoning_token_share: float = 0.5
+     max_answer_only_frac: float = 0.05
+@@ -209,7 +216,7 @@
+     max_answer_repeat_count: int = 32
+     reward_tolerance: float = 0.0
+     min_pool_prompt_frac: float = 0.0  # 0 = prompts need not come from the public pool
+-    max_train_token_steps: int = 8_000_000  # PLACEHOLDER: cap on steps x the tokens the trainer runs through the model for one file; 0 = no limit
++    max_train_token_steps: int = 16_000_000  # PLACEHOLDER: cap on steps x the tokens the trainer runs through the model for one file; 0 = no limit
+ 
+     # Queue and leases.
+     round_time_limit_s: int = 100 * 60  # launch rule: at most this long from the lease to the promotion of the winner
+--- a/v2/sn120_v2/gpu/train_job.py
++++ b/v2/sn120_v2/gpu/train_job.py
+@@ -14,7 +14,11 @@
+ 
+ Only the LoRA matrices train. They are fp32; the base stays frozen. The
+ optimizer is a fresh Adam per LoRA (betas 0.9 and 0.999, eps 1e-8, no weight
+-decay). One step is one pass over the whole batch and one Adam update.
++decay). One step is one pass over the whole batch. With ``minibatches`` 1 the
++pass is one Adam update. With M > 1 each pass shuffles the rows (seeded by the
++job seed) and cuts them into M mini-batches, one Adam update each; the Adam
++state carries over from one update to the next. q_old is then scored on the
++head for every row before the first update.
+ """
+ 
+ from __future__ import annotations
+@@ -22,6 +26,7 @@
+ import functools
+ import json
+ import math
++import random
+ import sys
+ import threading
+ import time
+@@ -45,7 +50,7 @@
+ from .batch import END_OF_TURN, derail_keep, fit_tokens
+ 
+ LOGIT_CHUNK = 2048  # tokens per pass through the output layer: a memory knob, with no effect on the result
+-OPTIMIZER = "adam, fresh per LoRA, betas 0.9/0.999, eps 1e-8, weight decay 0"
++OPTIMIZER = "adam, fresh per LoRA, kept over its updates, betas 0.9/0.999, eps 1e-8, weight decay 0"
+ # GPU memory that torch never takes. Triton loads a kernel, and the CUDA libraries make their handles, with memory
+ # of the CUDA driver. torch keeps every block it ever took, so after a long row the card can be full of blocks that
+ # torch does not use, and such a load fails with "Triton Error [CUDA]: out of memory". With this part left free it cannot.
+@@ -246,11 +251,31 @@
+         for weight in self.weights:
+             weight.grad = None
+ 
++    def score_old(self, rows: Sequence[dict]) -> None:
++        """q_old, the mask and the token count of each row, on the head itself: the first pass of ``train_rows`` without a gradient.
++
++        With mini-batches a row may first train after other updates, so its q_old must come before any of them.
++        """
++        head = self.model.get_output_embeddings()
++        with torch.no_grad():
++            for row in rows:
++                targets = torch.tensor(row["tokens"], device=self.device)
++                hidden = self.hidden(row["prompt_ids"] + row["tokens"])[0, len(row["prompt_ids"]) - 1 : -1]
++                chunks = range(0, len(targets), LOGIT_CHUNK)
++                parts = [token_scores(head(hidden[i : i + LOGIT_CHUNK]), targets[i : i + LOGIT_CHUNK], self.recipe) for i in chunks]
++                log_p, row["old"], mask = (torch.cat(part) for part in zip(*parts))
++                if row["capped"] and row["advantage"] < 0:
++                    recipe = self.recipe
++                    mask[derail_keep(log_p.tolist(), recipe.derail_window, recipe.derail_threshold, recipe.derail_tail) :] = False
++                row["mask"], row["count"] = mask, int(mask.sum())
++
+     def train_rows(self, rows: Sequence[dict], n_rows: int) -> tuple[float, int]:
+         """Add the gradient of these rows. Returns their share of the loss and the tokens that trained."""
+         head, loss, trained = self.model.get_output_embeddings(), 0.0, 0
+         for row in rows:
+             targets = torch.tensor(row["tokens"], device=self.device)
++            if "old" in row and row["old"].device != targets.device:  # with mini-batches a row can move to another replica
++                row["old"], row["mask"] = row["old"].to(targets.device), row["mask"].to(targets.device)
+             hidden = self.hidden(row["prompt_ids"] + row["tokens"])[0, len(row["prompt_ids"]) - 1 : -1]
+             leaf = hidden.detach().requires_grad_(True)  # the output layer runs in chunks on this copy
+             chunks = range(0, len(targets), LOGIT_CHUNK)
+@@ -315,33 +340,50 @@
+     optimizer = torch.optim.Adam(first.weights, lr=recipe.lora_lr)
+     loaded = time.monotonic()
+     losses, grad_norms, trained = [], [], 0
++    shuffle = random.Random(job["seed"])
+     with ThreadPoolExecutor(len(replicas)) as pool:
++        if recipe.minibatches > 1:
++            list(pool.map(lambda pair: pair[0].score_old(pair[1]), zip(replicas, [active[i :: len(replicas)] for i in range(len(replicas))])))
+         for _ in range(recipe.steps):
+-            shares = [active[i :: len(replicas)] for i in range(len(replicas))]
+-            results = list(pool.map(lambda pair: pair[0].train_rows(pair[1], len(rows)), zip(replicas, shares)))
+-            for other in replicas[1:]:
+-                for mine, theirs in zip(first.weights, other.weights):
+-                    if theirs.grad is not None:
+-                        mine.grad = theirs.grad.to(mine.device) if mine.grad is None else mine.grad + theirs.grad.to(mine.device)
+-                    theirs.grad = None
+-            norm = float(torch.nn.utils.clip_grad_norm_(first.weights, recipe.max_grad_norm))
+-            if not math.isfinite(norm):
+-                raise BatchRejected("training gave a gradient that is not finite")
+-            optimizer.step()
+-            optimizer.zero_grad(set_to_none=True)
+-            for other in replicas[1:]:
+-                for mine, theirs in zip(first.weights, other.weights):
+-                    theirs.data.copy_(mine.data)
+-            losses.append(sum(loss for loss, _ in results))
+-            grad_norms.append(norm)
+-            trained = sum(count for _, count in results)
++            if recipe.minibatches == 1:
++                batches, divisor = [active], len(rows)  # one update over the whole file, as before
++            else:
++                order = list(active)
++                shuffle.shuffle(order)
++                batches = [sorted(order[j :: recipe.minibatches], key=lambda row: -len(row["tokens"])) for j in range(recipe.minibatches)]
++                divisor = None  # the mean over the rows of each mini-batch
++            step_tokens = 0
++            for batch in batches:
++                if not batch:
++                    continue
++                shares = [batch[i :: len(replicas)] for i in range(len(replicas))]
++                n_rows = divisor or len(batch)
++                results = list(pool.map(lambda pair: pair[0].train_rows(pair[1], n_rows), zip(replicas, shares)))
++                for other in replicas[1:]:
++                    for mine, theirs in zip(first.weights, other.weights):
++                        if theirs.grad is not None:
++                            mine.grad = theirs.grad.to(mine.device) if mine.grad is None else mine.grad + theirs.grad.to(mine.device)
++                        theirs.grad = None
++                norm = float(torch.nn.utils.clip_grad_norm_(first.weights, recipe.max_grad_norm))
++                if not math.isfinite(norm):
++                    raise BatchRejected("training gave a gradient that is not finite")
++                optimizer.step()
++                optimizer.zero_grad(set_to_none=True)
++                for other in replicas[1:]:
++                    for mine, theirs in zip(first.weights, other.weights):
++                        theirs.data.copy_(mine.data)
++                losses.append(sum(loss for loss, _ in results))
++                grad_norms.append(norm)
++                step_tokens += sum(count for _, count in results)
++            trained = step_tokens
+     facts = {"losses": losses, "grad_norms": grad_norms, "trained_tokens": trained, "rows": len(rows)}
+     # Rows cut to a training token cap, and rows with no output token left inside the caps.
+     facts.update(truncated_rows=sum(row["truncated"] for row in rows), dropped_rows=dropped)
+     result = save(first, recipe, job, out_dir, facts)
+     # Times and sizes for the box log. They are not part of the LoRA files: a LoRA hash never depends on a clock.
+     result.update(load_s=loaded - started, step_s=time.monotonic() - loaded, n_gpus=len(replicas), rows=len(rows))
+-    result.update(forward_tokens=sum(len(row["prompt_ids"]) + len(row["tokens"]) for row in active) * recipe.steps)
++    passes = recipe.steps + (recipe.minibatches > 1)  # the q_old pass of mini-batch training is one forward more
++    result.update(forward_tokens=sum(len(row["prompt_ids"]) + len(row["tokens"]) for row in active) * passes)
+     return result
+ 
+ 
+@@ -371,7 +413,7 @@
+         "target_modules": list(recipe.target_modules),
+         "inference_mode": True,
+     }
+-    used = {key: getattr(recipe, key) for key in ("lora_lr", "steps", "alpha", "group_size", "sample_temperature", "rank", "max_grad_norm", "global_norm_cap")}
++    used = {key: getattr(recipe, key) for key in ("lora_lr", "steps", "minibatches", "alpha", "group_size", "sample_temperature", "rank", "max_grad_norm", "global_norm_cap")}
+     # step_norm_before_cap is the norm that training gave; step_norm is the norm of the stored LoRA.
+     report = {"optimizer": OPTIMIZER, "seed": job["seed"], "step_norm": norm, "step_norm_before_cap": uncapped, "recipe_values": used, **facts}
+     out_dir.mkdir(parents=True, exist_ok=True)
